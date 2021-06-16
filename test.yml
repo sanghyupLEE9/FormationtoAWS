@@ -25,8 +25,7 @@ Mappings:
       window: ami-0685efd12a23690f5
 
 Parameters:
-  
-
+ 
   stackname:
     Description: This is Stack Name 
     Type: String
@@ -38,7 +37,7 @@ Parameters:
   AMI: # AMI는 기본적으로 지정값을 사용해야하기에 mapping이용하지 않고 우선 생성되어있는 AMI로 테스트 진행
     Description: AMI of EC2
     Type: AWS::EC2::Image::Id
-    AllowedValue: 
+    AllowedValues: 
       - Linux2
       - window
 
@@ -111,7 +110,7 @@ Resources:
   webserver: #간단한 webserver 생성 
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref AMI
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
       KeyName: !Ref KeyName
       AvailabilityZone: !Ref AZ
       InstanceType: !Ref InstanceType
