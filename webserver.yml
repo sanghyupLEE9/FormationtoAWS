@@ -96,7 +96,7 @@ Parameters:
   # AMI: # AMI는 instance type az등과 같이 mapping 방식 사용과 직접 지정 방식이 있다
   #   Description: AMI of EC2
   #   Type: AWS::EC2::Image::Id
-  #   Default: ami-0d4ba6ec02a6370d4
+  #   Default: ami-0f2c95e9fe3f8f80e
   AMI:
     Description: AMI of EC2
     Type: String
