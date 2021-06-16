@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: EC2 systemmanger Configure
+Metadata: #파라미터들의 그룹들을 Label 작업
+  AWS::CloudFormation::Interface: 
+    ParameterGroups: 
+      - 
+        Label: 
+          default: "Network Configuration"
+        Parameters: 
+          - VPCID
+          - Sub
+          - AZ
+      - 
+        Label: 
+          default: "Amazon EC2 Configuration"
+        Parameters: 
+          - InstanceType
+          - KeyName
+          - sg
+          - AMI
+Mappings:
+  Regionmap:  
+    ap-northeast-2:
+      Linux2: ami-0f2c95e9fe3f8f80e
+      window: ami-0685efd12a23690f5
+
+Parameters:
+  
+
+  stackname:
+    Description: This is Stack Name 
+    Type: String
+    Default: TestingFormation
+  KeyName: #자신의 리전의 있는 keypair 사용하도록 지정
+    Description: Name of KeyPair
+    Type: AWS::EC2::KeyPair::KeyName
+
+  AMI: # AMI는 기본적으로 지정값을 사용해야하기에 mapping이용하지 않고 우선 생성되어있는 AMI로 테스트 진행
+    Description: AMI of EC2
+    Type: AWS::EC2::Image::Id
+    AllowedValue: 
+      - Linux2
+      - window
+
+
+  AZ: #따로 지정하지 않고 템플릿에서 선택하도록(Select to your AZ)
+    Description: AvailabilityZone for public
+    Type: AWS::EC2::AvailabilityZone::Name
+
+  sg:  # 보안그룹 선택(Select to your sg)
+    Type: AWS::EC2::SecurityGroup::Id
+
+  VPCID: # VPC 선택(Select to your VPC)
+    Type: 'AWS::EC2::VPC::Id'
+    Description: VpcId of your existing Virtual Private Cloud (VPC)
+  
+  Sub:  # 서브넷 선택(Select to your subnet)
+    Description: Cidr Block for Public Subnet
+    Type: AWS::EC2::Subnet::Id
+  
+  InstanceType: #인스턴스 타입
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - r3.large
+      - r3.xlarge
+  
+
+Resources:
+  
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Description: Create Formation Ec2 Role
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      RoleName: EC2SSM-CreateFormation
+    
+  webserver: #간단한 webserver 생성 
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AMI
+      KeyName: !Ref KeyName
+      AvailabilityZone: !Ref AZ
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref Sub
+      IamInstanceProfile: !Ref IAMRole
+      SecurityGroupIds: 
+        - !Ref sg
+      UserData:
+        !Base64 |
+        #!/bin/bash -ex
+        yum install -y  httpd 
+        systemctl enable httpd
+        systemctl start httpd 
+        echo "testing formation" > /var/www/html/index.html 
+      Tags:
+        - Key: Name
+          Value: Web Server
+  
+Outputs:
+  InstanceID:
+    Description: The Instance ID
+    Value: !Ref webserver

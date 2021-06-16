@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: crossaccount
+
+Parameters:
+  StackName:
+    Type: String
+    Description: Stack name that will be deleted.
+    Default: SaltwareCrossAccount
+  AWSRole: 
+    Type: String
+    Description: create your role 
+    Default: SaltwareCrossAccount
+  
+
+Resources:
+
+  crossaccountRole:
+    Type: 'AWS::IAM::Role'
+    DeletionPolicy: Retain
+    Properties:
+      AssumeRolePolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "arn:aws:iam::<accountid>:user/crossaccount"
+              },
+              "Action": "sts:AssumeRole",
+              "Condition": {}
+            }
+          ]
+        }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSSupportAccess
+        - arn:aws:iam::aws:policy/AWSSavingsPlansReadOnlyAccess
+      RoleName: !Ref AWSRole
+  custompolicy:
+    Type: 'AWS::IAM::Policy'
+    DeletionPolicy: Retain
+    Properties:
+      PolicyName: saltware_custom_deny
+      PolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                  "dynamodb:GetItem",
+                  "dynamodb:BatchGetItem",
+                  "dynamodb:Query",
+                  "dynamodb:Scan",
+                  "ecr:BatchGetImage",
+                  "ecr:GetAuthorizationToken",
+                  "ecr:GetDownloadUrlForLayer",
+                  "kinesis:Get*",
+                  "s3:GetObject",
+                  "glacier:Get*",
+                  "sdb:Select*",
+                  "sqs:ReceiveMessage"
+              ],
+              "Resource": "*",
+              "Effect": "Deny"
+            }
+          ]
+        }
+      Roles:
+        - !Ref crossaccountRole
+ 
