@@ -2,10 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: crossaccount
 
 Parameters:
-  StackName:
-    Type: String
-    Description: Stack name that will be deleted.
-    Default: SaltwareCrossAccount
+
   AWSRole: 
     Type: String
     Description: create your role 
@@ -14,9 +11,10 @@ Parameters:
 
 Resources:
 
-  crossaccountRole:
+  CrossaccountRole:
     Type: 'AWS::IAM::Role'
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         {
@@ -37,9 +35,12 @@ Resources:
         - arn:aws:iam::aws:policy/AWSSupportAccess
         - arn:aws:iam::aws:policy/AWSSavingsPlansReadOnlyAccess
       RoleName: !Ref AWSRole
+  
   custompolicy:
     Type: 'AWS::IAM::Policy'
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+
     Properties:
       PolicyName: saltware_custom_deny
       PolicyDocument:
@@ -67,5 +68,5 @@ Resources:
           ]
         }
       Roles:
-        - !Ref crossaccountRole
+        - !Ref CrossaccountRole
  

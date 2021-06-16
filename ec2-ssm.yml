@@ -1,15 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Infra configuration Next Step EC2 systemmanger Configure
-Metadata: #íŒŒë¼ë¯¸í„°ë“¤ì˜ ê·¸ë£¹ë“¤ì„ Label ì‘ì—…
+Metadata: #ÆÄ¶ó¹ÌÅÍµéÀÇ ±×·ìµéÀ» Label ÀÛ¾÷
   AWS::CloudFormation::Interface: 
     ParameterGroups: 
       - 
         Label: 
           default: "Network Configuration"
         Parameters: 
-          - VPCID
           - Sub
-          - AZ
       - 
         Label: 
           default: "Amazon EC2 Configuration"
@@ -26,11 +24,7 @@ Mappings:
 
 Parameters:
  
-  stackname:
-    Description: This is Stack Name 
-    Type: String
-    Default: EC2-SSMtest
-  KeyName: #ìì‹ ì˜ ë¦¬ì „ì˜ ìˆëŠ” keypair ì‚¬ìš©í•˜ë„ë¡ ì§€ì •
+  KeyName: #ÀÚ½ÅÀÇ ¸®ÀüÀÇ ÀÖ´Â keypair »ç¿ëÇÏµµ·Ï ÁöÁ¤
     Description: Name of KeyPair
     Type: AWS::EC2::KeyPair::KeyName
 
@@ -42,23 +36,14 @@ Parameters:
       - Linux2
       - window
 
-
-  AZ: #ë”°ë¡œ ì§€ì •í•˜ì§€ ì•Šê³  í…œí”Œë¦¿ì—ì„œ ì„ íƒí•˜ë„ë¡(Select to your AZ)
-    Description: AvailabilityZone for public
-    Type: AWS::EC2::AvailabilityZone::Name
-
-  sg:  # ë³´ì•ˆê·¸ë£¹ ì„ íƒ(Select to your sg)
+  sg:  # º¸¾È±×·ì ¼±ÅÃ(Select to your sg)
     Type: AWS::EC2::SecurityGroup::Id
-
-  VPCID: # VPC ì„ íƒ(Select to your VPC)
-    Type: 'AWS::EC2::VPC::Id'
-    Description: VpcId of your existing Virtual Private Cloud (VPC)
   
-  Sub:  # ì„œë¸Œë„· ì„ íƒ(Select to your subnet)
+  Sub:  # ¼­ºê³İ ¼±ÅÃ(Select to your subnet)
     Description: Cidr Block for Public Subnet
     Type: AWS::EC2::Subnet::Id
   
-  InstanceType: #ì¸ìŠ¤í„´ìŠ¤ íƒ€ì…
+  InstanceType: #ÀÎ½ºÅÏ½º Å¸ÀÔ
     Description: WebServer EC2 instance type
     Type: String
     Default: t2.small
@@ -94,29 +79,36 @@ Parameters:
 Resources:
   
   IAMRole:
-    Type: AWS::IAM::Role
+    Type: "AWS::IAM::Role"
     Properties: 
       AssumeRolePolicyDocument: 
         Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
       Description: Create Formation Ec2 Role
       ManagedPolicyArns: 
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       RoleName: EC2SSM-CreateFormation
-    
-  webserver: #ê°„ë‹¨í•œ webserver ìƒì„± 
+  webinstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - !Ref IAMRole
+  webserver: #°£´ÜÇÑ webserver »ı¼º 
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
       KeyName: !Ref KeyName
-      AvailabilityZone: !Ref AZ
       InstanceType: !Ref InstanceType
       SubnetId: !Ref Sub
-      IamInstanceProfile: !Ref IAMRole
+      IamInstanceProfile: !Ref webinstanceProfile
       SecurityGroupIds: 
         - !Ref sg
       UserData:
