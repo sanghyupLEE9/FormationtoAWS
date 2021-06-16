@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: EC2 systemmanger Configure
+Description: Infra configuration Next Step EC2 systemmanger Configure
 Metadata: #파라미터들의 그룹들을 Label 작업
   AWS::CloudFormation::Interface: 
     ParameterGroups: 
@@ -29,15 +29,16 @@ Parameters:
   stackname:
     Description: This is Stack Name 
     Type: String
-    Default: TestingFormation
+    Default: EC2-SSMtest
   KeyName: #자신의 리전의 있는 keypair 사용하도록 지정
     Description: Name of KeyPair
     Type: AWS::EC2::KeyPair::KeyName
 
-  AMI: # AMI는 기본적으로 지정값을 사용해야하기에 mapping이용하지 않고 우선 생성되어있는 AMI로 테스트 진행
+   AMI:
     Description: AMI of EC2
-    Type: AWS::EC2::Image::Id
-    AllowedValues: 
+    Type: String
+    Default: Linux2
+    AllowedValues:
       - Linux2
       - window
 
