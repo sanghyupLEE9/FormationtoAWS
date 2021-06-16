@@ -34,7 +34,7 @@ Parameters:
     Description: Name of KeyPair
     Type: AWS::EC2::KeyPair::KeyName
 
-   AMI:
+  AMI:
     Description: AMI of EC2
     Type: String
     Default: Linux2
