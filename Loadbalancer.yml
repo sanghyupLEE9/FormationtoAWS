@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: VPC-Ec2  Configuration Formation Template 
+Next Template This Template is Loadbalancer and AutoScaling Testing
+
+Metadata: 
+  AWS::CloudFormation::Interface:
+    Parameter:
+      - 
+        Label:
+          default: "Load balancer Configuration Recommended az are a and c."
+        parameters:
+          - Subnet1
+          - Subnet2
+      - 
+        Label:
+          default: "Auto Scaling Configuration Recommended az are a and c."
+        parameters:
+          - Subnet1
+          - Subnet2
+Mappings: # sample List ( 해당 리전에서 제공하는 AMI 및 리전의 각 AZ를 매핑)
+  Regionmap:  
+    ap-northeast-2:
+      Linux2: ami-0f2c95e9fe3f8f80e
+      window: ami-0685efd12a23690f5
+      AZs: [ap-northeast-2a,ap-northeast-2b,ap-northeast-2c,ap-northeast-2d]
+
+Parameters:
+  EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
+    Description: A common name for your resources
+    Type: String 
+  Subnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description : Choose the subnet you have(Used Load balancer and Auto Scaling )
+  Subnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description : Choose the subnet you have(Used Load balancer and Auto Scaling )
+  InstanceList: # having Instance 
+    Type: List<AWS::EC2::Instance::Id>
+    Description: Choose the running Instance 
+
+Resources:
+  Loadbalancersg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ALB Security Group
+      GroupName: !Sub ${EnvironmentName} LB-security
+      VpcId:
+        !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+  ALB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    properties:
+      LoadBalancerName: ${EnvironmentName}LB
+      AvailabilityZones:
+        
+
+
+
+ 
