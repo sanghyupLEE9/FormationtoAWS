@@ -27,7 +27,7 @@ Mappings:
     ap-northeast-2:
       Linux2: ami-0f2c95e9fe3f8f80e
       window: ami-0685efd12a23690f5
-      AZs: [ap-northeast-2a,ap-northeast-2b,ap-northeast-2c,ap-northeast-2d]
+      
     
           
 Parameters:   
@@ -157,7 +157,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 0, !FindInMap [ Regionmap, !Ref 'AWS::Region', AZs ]]
+      AvailabilityZone: !Select [ 0, !GetAZs ]
       CidrBlock: !Ref PubCIDR1
       MapPublicIpOnLaunch: true
       Tags:
@@ -167,7 +167,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 2, !FindInMap [ Regionmap, !Ref 'AWS::Region', AZs ]]
+      AvailabilityZone: !Select [ 2, !GetAZs ]
       CidrBlock: !Ref PubCIDR2
       MapPublicIpOnLaunch: true
       Tags:
@@ -178,7 +178,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 0, !FindInMap [ Regionmap, !Ref 'AWS::Region', AZs ]]
+      AvailabilityZone: !Select [ 0, !GetAZs ]
       CidrBlock: !Ref PriCIDR1
       MapPublicIpOnLaunch: false
       Tags:
@@ -188,7 +188,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 2, !FindInMap [ Regionmap, !Ref 'AWS::Region', AZs ]]
+      AvailabilityZone: !Select [ 2, !GetAZs ]
       CidrBlock: !Ref PriCIDR2
       MapPublicIpOnLaunch: false
       Tags:
