@@ -33,6 +33,13 @@ Parameters:
   EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
     Description: A common name for your resources
     Type: String
+  AMI:
+    Description: AMI of EC2
+    Type: String
+    Default: Linux2
+    AllowedValues:
+      - Linux2
+      - window
   Key:
     Description: choice your key
     Type: AWS::EC2::KeyPair::KeyName
@@ -109,7 +116,7 @@ Resources:
     Type: AWS::AutoScaling::LaunchConfiguration
     Description: Ec2 launch configuration
     Properties:
-      ImageId: ami-03b76b94164de83cb
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]
       InstanceType: t2.micro
       LaunchConfigurationName: !Sub ${EnvironmentName}-LC
       KeyName: !Ref Key 
