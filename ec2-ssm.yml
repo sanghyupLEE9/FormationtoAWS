@@ -105,7 +105,6 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
-      KeyName: !Ref KeyName
       InstanceType: !Ref InstanceType
       SubnetId: !Ref Sub
       IamInstanceProfile: !Ref webinstanceProfile
