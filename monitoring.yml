@@ -63,7 +63,7 @@ Resources:
       - Name: InstanceId
         Value: !Select [0, !Ref EC2List]
       
-  Ec2cpuAlarm:
+  Ec2cpuAlarm2:
     Type: AWS::CloudWatch::Alarm
     Properties:
       MetricName: CPUUtilization

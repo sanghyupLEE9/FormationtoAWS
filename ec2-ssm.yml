@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Infra configuration Next Step EC2 systemmanger Configure
-Metadata: #ÆÄ¶ó¹ÌÅÍµéÀÇ ±×·ìµéÀ» Label ÀÛ¾÷
+Metadata: #íŒŒë¼ë¯¸í„°ë“¤ì˜ ê·¸ë£¹ë“¤ì„ Label ì‘ì—…
   AWS::CloudFormation::Interface: 
     ParameterGroups: 
       - 
@@ -24,7 +24,7 @@ Mappings:
 
 Parameters:
  
-  KeyName: #ÀÚ½ÅÀÇ ¸®ÀüÀÇ ÀÖ´Â keypair »ç¿ëÇÏµµ·Ï ÁöÁ¤
+  KeyName: #ìì‹ ì˜ ë¦¬ì „ì˜ ìˆëŠ” keypair ì‚¬ìš©í•˜ë„ë¡ ì§€ì •
     Description: Name of KeyPair
     Type: AWS::EC2::KeyPair::KeyName
 
@@ -36,14 +36,14 @@ Parameters:
       - Linux2
       - window
 
-  sg:  # º¸¾È±×·ì ¼±ÅÃ(Select to your sg)
+  sg:  # ë³´ì•ˆê·¸ë£¹ ì„ íƒ(Select to your sg)
     Type: AWS::EC2::SecurityGroup::Id
   
-  Sub:  # ¼­ºê³İ ¼±ÅÃ(Select to your subnet)
+  Sub:  # ì„œë¸Œë„· ì„ íƒ(Select to your subnet)
     Description: Cidr Block for Public Subnet
     Type: AWS::EC2::Subnet::Id
   
-  InstanceType: #ÀÎ½ºÅÏ½º Å¸ÀÔ
+  InstanceType: #ì¸ìŠ¤í„´ìŠ¤ íƒ€ì…
     Description: WebServer EC2 instance type
     Type: String
     Default: t2.small
@@ -101,7 +101,7 @@ Resources:
     Properties:
       Roles:
         - !Ref IAMRole
-  webserver: #°£´ÜÇÑ webserver »ı¼º 
+  webserver: #ê°„ë‹¨í•œ webserver ìƒì„± 
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
