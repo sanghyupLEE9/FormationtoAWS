@@ -9,7 +9,7 @@ VPC-EC2 : VPC configuration and test EC2 (bastion and webserver)
 
 
 
-**# Systemmanager를 통하여 인스턴스의 ssh 접근을 Keypair없이 자유롭게 접근이가능한 템플릿이다.
+**# Systemmanager를 통하여 인스턴스의 ssh 접근을 Keypair없이 자유롭게 접근이가능한 템플릿이다.  
 **EC2-ssm : systemmanager Role configuration and Ec2 testing 
 
 
