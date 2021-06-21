@@ -14,7 +14,6 @@ Metadata: #파라미터들의 그룹들을 Label 작업
           default: "Amazon EC2 Configuration"
         Parameters: 
           - InstanceType
-          - KeyName
           - sg
           - AMI
 Mappings:
@@ -25,10 +24,6 @@ Mappings:
 
 Parameters:
  
-  KeyName: #자신의 리전의 있는 keypair 사용하도록 지정
-    Description: Name of KeyPair
-    Type: AWS::EC2::KeyPair::KeyName
-
   AMI:
     Description: AMI of EC2
     Type: String
