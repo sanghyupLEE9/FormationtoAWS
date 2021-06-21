@@ -308,10 +308,12 @@ Resources:
       UserData:
         !Base64 |
         #!/bin/bash -ex
-        yum install -y  httpd 
+        amazon-linux-extras install -y epel
+        yum install -y  httpd git php stress
+        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
+        cp /FormationtoAWS/index.php /var/www/html/index.php
         systemctl enable httpd
         systemctl start httpd 
-        echo "testing formation" > /var/www/html/index.html 
 
       Tags:
       - 

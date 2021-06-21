@@ -8,6 +8,7 @@ Metadata: #파라미터들의 그룹들을 Label 작업
           default: "Network Configuration"
         Parameters: 
           - Sub
+          - Sub2
       - 
         Label: 
           default: "Amazon EC2 Configuration"
@@ -42,7 +43,10 @@ Parameters:
   Sub:  # 서브넷 선택(Select to your subnet)
     Description: Cidr Block for Public Subnet
     Type: AWS::EC2::Subnet::Id
-  
+  Sub2:  # 서브넷 선택(Select to your subnet)
+    Description: Cidr Block for Public Subnet
+    Type: AWS::EC2::Subnet::Id
+ 
   InstanceType: #인스턴스 타입
     Description: WebServer EC2 instance type
     Type: String
@@ -78,7 +82,7 @@ Parameters:
 
 Resources:
   
-  IAMRole:
+  ssmIAMRole:
     Type: "AWS::IAM::Role"
     Properties: 
       AssumeRolePolicyDocument: 
@@ -100,7 +104,8 @@ Resources:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
       Roles:
-        - !Ref IAMRole
+        - !Ref ssmIAMRole
+  
   webserver: #간단한 webserver 생성 
     Type: AWS::EC2::Instance
     Properties:
@@ -114,13 +119,17 @@ Resources:
       UserData:
         !Base64 |
         #!/bin/bash -ex
-        yum install -y  httpd 
+        amazon-linux-extras install -y epel
+        yum install -y  httpd git php stress
+        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
+        cp /FormationtoAWS/index.php /var/www/html/index.php
         systemctl enable httpd
-        systemctl start httpd 
-        echo "testing formation" > /var/www/html/index.html 
+        systemctl start httpd
+        
       Tags:
         - Key: Name
           Value: Web Server
+         
   
 Outputs:
   InstanceID:
