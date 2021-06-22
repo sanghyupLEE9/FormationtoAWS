@@ -54,7 +54,7 @@ Parameters:
     Description: select your subnets 
     Type: List<AWS::EC2::Subnet::Id>
   ASGsg:
-    Type: List<AWS::EC2::SecurityGroup::Id>
+    Type: AWS::EC2::SecurityGroup::Id
     Description: select your sg (ec2 used)
 
 
