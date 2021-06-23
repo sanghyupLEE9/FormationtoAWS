@@ -53,15 +53,9 @@ Parameters:
   ASGSubnets: #ASG을 구성할 private subnet의 다중 선택
     Description: select your subnets 
     Type: List<AWS::EC2::Subnet::Id>
-<<<<<<< HEAD
   ASGsg:
     Type: AWS::EC2::SecurityGroup::Id
     Description: select your security Group (ec2 used)
-=======
-  ASGsg: # sg그룹의 종류를 나열하여 그중 EC2 인스턴스에게 지정할 Sg
-    Type: AWS::EC2::SecurityGroup::Id
-    Description: select your sg (ec2 used)
->>>>>>> main
 
 
 Resources:

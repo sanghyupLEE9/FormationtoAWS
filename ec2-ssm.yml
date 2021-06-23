@@ -101,7 +101,7 @@ Resources:
       KeyName: !Ref KeyName
       SecurityGroupIds: 
       - !Ref sg
-      SubnetId: !Ref sub
+      SubnetId: !Ref Sub
       UserData:
         !Base64 |
         #!/bin/bash -ex
