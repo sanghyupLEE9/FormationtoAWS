@@ -2,17 +2,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Infra configuration Next Step EC2 systemmanger Configure
 Metadata: #파라미터들의 그룹들을 Label 작업
   AWS::CloudFormation::Interface: 
-    ParameterGroups: 
-      - 
-        Label: 
-          default: "Network Configuration"
-        Parameters: 
-          - Sub
-          - Sub2
+    ParameterGroups:          
       - 
         Label: 
           default: "Amazon EC2 Configuration"
-        Parameters: 
+        Parameters:
+          - Sub 
           - InstanceType
           - KeyName
           - sg
@@ -41,12 +36,9 @@ Parameters:
     Type: AWS::EC2::SecurityGroup::Id
   
   Sub:  # 서브넷 선택(Select to your subnet)
-    Description: Cidr Block for Public Subnet
+    Description: Cidr Block for Subnet
     Type: AWS::EC2::Subnet::Id
-  Sub2:  # 서브넷 선택(Select to your subnet)
-    Description: Cidr Block for Public Subnet
-    Type: AWS::EC2::Subnet::Id
- 
+   
   InstanceType: #인스턴스 타입
     Description: WebServer EC2 instance type
     Type: String
@@ -106,16 +98,15 @@ Resources:
       Roles:
         - !Ref ssmIAMRole
   
-  webserver: #간단한 webserver 생성 
+  webserver:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2] 
-      KeyName: !Ref KeyName
       InstanceType: !Ref InstanceType
-      SubnetId: !Ref Sub
-      IamInstanceProfile: !Ref webinstanceProfile
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]  
+      KeyName: !Ref KeyName
       SecurityGroupIds: 
-        - !Ref sg
+      - !Ref sg
+      SubnetId: !Ref sub
       UserData:
         !Base64 |
         #!/bin/bash -ex
@@ -124,11 +115,12 @@ Resources:
         git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
         cp /FormationtoAWS/index.php /var/www/html/index.php
         systemctl enable httpd
-        systemctl start httpd
-        
+        systemctl start httpd 
+
       Tags:
-        - Key: Name
-          Value: Web Server
+      - 
+        Key: Name
+        Value: webserver
          
   
 Outputs:

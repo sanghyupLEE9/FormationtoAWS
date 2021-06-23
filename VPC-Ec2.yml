@@ -287,31 +287,6 @@ Resources:
         SourceSecurityGroupId: !Ref sshsecurity
      
 ############# instnace #####################
-  webserver:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]  
-      KeyName: !Ref KeyName
-      SecurityGroupIds: 
-      - !Ref websecurity
-      SubnetId: !Ref PrivateSubnet1
-      UserData:
-        !Base64 |
-        #!/bin/bash -ex
-        amazon-linux-extras install -y epel
-        yum install -y  httpd git php stress
-        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
-        cp /FormationtoAWS/index.php /var/www/html/index.php
-        systemctl enable httpd
-        systemctl start httpd 
-
-      Tags:
-      - 
-        Key: Name
-        Value: webserver
-
-
   bastion:
     Type: AWS::EC2::Instance
     Properties:
