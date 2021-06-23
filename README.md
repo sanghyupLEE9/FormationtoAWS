@@ -39,7 +39,7 @@ VPC-EC2.yml : VPC configuration and test EC2 (bastion and webserver)
 
 
 ##ALB-Autoscaling 구성으로 기본 AmazoneLinux2의 AMi를 통한 Userdata 커스텀을 통하여 Stress테스트를 진행하며  
-    Cloudwatch CPU metric 값에 따른 Alarm 트리거 및 AutoScaling Scale-out 및 Scale-down이 발생한다.
+    Cloudwatch CPU metric 값에 따른 Alarm 트리거 및 AutoScaling Scale-out 및 Scale-down이 발생한다.        
 **Loadbalancer-step adjustment.yml : Loadbalncer and Autoscaling Configuration 
 
 
