@@ -109,7 +109,7 @@ Resources:
   webserver: #간단한 webserver 생성 
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2] 
       KeyName: !Ref KeyName
       InstanceType: !Ref InstanceType
       SubnetId: !Ref Sub

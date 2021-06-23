@@ -92,10 +92,7 @@ Parameters:
       - r3.large
       - r3.xlarge
   
-  # AMI: # AMI는 instance type az등과 같이 mapping 방식 사용과 직접 지정 방식이 있다
-  #   Description: AMI of EC2
-  #   Type: AWS::EC2::Image::Id
-  #   Default: ami-0f2c95e9fe3f8f80e
+ 
   AMI:
     Description: AMI of EC2
     Type: String
@@ -211,7 +208,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Routes
+          Value: !Sub ${EnvironmentName} PublicRT
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -239,7 +236,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private Routes (AZ1)
+          Value: !Sub ${EnvironmentName} PrivateRT
 
   PrivateRoute:
     Type: AWS::EC2::Route
@@ -290,44 +287,44 @@ Resources:
         SourceSecurityGroupId: !Ref sshsecurity
      
 ############# instnace #####################
-  # webserver:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: !Ref InstanceType
-  #     ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]   #위의 Mappings 데이터에서 Regionmap에 대한 속성값 추출 그중 AMI 참조 AWS::Region참조시 자동으로 사용리전 적용
-  #     KeyName: !Ref KeyName
-  #     SecurityGroupIds: 
-  #     - !Ref websecurity
-  #     SubnetId: !Ref PrivateSubnet1
-  #     UserData:
-  #       !Base64 |
-  #       #!/bin/bash -ex
-  #       amazon-linux-extras install -y epel
-  #       yum install -y  httpd git php stress
-  #       git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
-  #       cp /FormationtoAWS/index.php /var/www/html/index.php
-  #       systemctl enable httpd
-  #       systemctl start httpd 
+  webserver:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]  
+      KeyName: !Ref KeyName
+      SecurityGroupIds: 
+      - !Ref websecurity
+      SubnetId: !Ref PrivateSubnet1
+      UserData:
+        !Base64 |
+        #!/bin/bash -ex
+        amazon-linux-extras install -y epel
+        yum install -y  httpd git php stress
+        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
+        cp /FormationtoAWS/index.php /var/www/html/index.php
+        systemctl enable httpd
+        systemctl start httpd 
 
-  #     Tags:
-  #     - 
-  #       Key: Name
-  #       Value: webserver
+      Tags:
+      - 
+        Key: Name
+        Value: webserver
 
 
-  # bastion:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: !Ref InstanceType
-  #     ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]
-  #     KeyName: !Ref KeyName
-  #     SecurityGroupIds: 
-  #     - !Ref sshsecurity
-  #     SubnetId: !Ref PublicSubnet1
-  #     Tags:
-  #     - 
-  #       Key: Name
-  #       Value: bastion
+  bastion:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2] #위의 Mappings 데이터에서 Regionmap에 대한 속성값 추출 그중 AMI 참조 AWS::Region참조시 자동으로 사용리전 적용
+      KeyName: !Ref KeyName
+      SecurityGroupIds: 
+      - !Ref sshsecurity
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+      - 
+        Key: Name
+        Value: bastion
   
 
   
