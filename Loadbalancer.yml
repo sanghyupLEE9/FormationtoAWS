@@ -1,0 +1,201 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: VPC-Ec2  Configuration Formation Template Next Template This Template is Loadbalancer and AutoScaling Testing
+
+
+Metadata: #파라미터들의 그룹들을 Label 작업
+  AWS::CloudFormation::Interface: 
+    ParameterGroups: 
+      - 
+        Label: 
+          default: "Loadbalancer Configuration"
+        Parameters: 
+          - ELBSubnets
+          - VPC
+
+      - 
+        Label: 
+          default: "Amazon EC2 Configuration"
+        Parameters: 
+          - ASGSubnets
+          - ASGsg
+          - Key
+
+
+
+Mappings: # sample List ( 해당 리전에서 제공하는 AMI 및 리전의 각 AZ를 매핑)
+  Regionmap:  
+    ap-northeast-2:
+      Linux2: ami-0f2c95e9fe3f8f80e
+      window: ami-0685efd12a23690f5
+      
+
+Parameters:
+  EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
+    Description: A common name for your resources
+    Type: String
+  AMI:
+    Description: AMI of EC2
+    Type: String
+    Default: Linux2
+    AllowedValues:
+      - Linux2
+      - window
+  Key:
+    Description: choice your key
+    Type: AWS::EC2::KeyPair::KeyName
+  VPC:
+    Description: Select your VPC 
+    Type: AWS::EC2::VPC::Id 
+  ELBSubnets: #List를 이용한 다중 Subnet 선택
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: select your subnets 
+    
+  ASGSubnets: #ASG을 구성할 private subnet의 다중 선택
+    Description: select your subnets 
+    Type: List<AWS::EC2::Subnet::Id>
+<<<<<<< HEAD
+  ASGsg:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: select your security Group (ec2 used)
+=======
+  ASGsg: # sg그룹의 종류를 나열하여 그중 EC2 인스턴스에게 지정할 Sg
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: select your sg (ec2 used)
+>>>>>>> main
+
+
+Resources:
+  #########################################################
+  #                                                       #
+  #                         ALB                           #
+  #                                                       #    
+  #########################################################
+  Loadbalancersg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ALB Security Group
+      GroupName: !Sub ${EnvironmentName}-LBsg
+      VpcId:
+        !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub ${EnvironmentName}-LB
+      Subnets: !Ref ELBSubnets
+      SecurityGroups:
+        - !Ref Loadbalancersg
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-LB
+
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+
+  
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${EnvironmentName}-TG
+      VpcId: !Ref VPC
+      Port: 80
+      Protocol: HTTP
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+  #########################################################
+  #                                                       #
+  #                         ASG                           #
+  #                                                       #    
+  #########################################################
+  LaunchConf:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Description: Ec2 launch configuration
+    Properties:
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
+      InstanceType: t2.micro
+      LaunchConfigurationName: !Sub ${EnvironmentName}-LC
+      KeyName: !Ref Key 
+      InstanceMonitoring: true
+      SecurityGroups: 
+        - !Ref ASGsg
+      UserData:
+        !Base64 |
+        #!/bin/bash -ex
+        amazon-linux-extras install -y epel
+        yum install -y  httpd git php stress
+        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
+        cp /FormationtoAWS/index.php /var/www/html/index.php
+        systemctl enable httpd
+        systemctl start httpd 
+
+
+  ASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Description: Logical Ec2 group
+    Properties:
+      MaxSize: 4
+      MinSize: 2
+      AutoScalingGroupName: !Sub ${EnvironmentName}-ASG
+      Cooldown: 30 
+      DesiredCapacity: 2
+      LaunchConfigurationName: !Ref LaunchConf
+      VPCZoneIdentifier: !Ref ASGSubnets
+      TargetGroupARNs: 
+        - !Ref ALBTargetGroup
+      HealthCheckGracePeriod: 300
+      HealthCheckType: ELB
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: true
+          Value: web-asg
+        
+
+  Ec2policy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref ASG
+      PolicyType: TargetTrackingScaling   #대상 추적 조정 정책 생성
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 5
+
+
+        
+
+Outputs:
+  LoadBalancer:
+    Description: A reference to the Application Load Balancer
+    Value: !Ref ALB
+
+  LoadBalancerUrl:
+    Description: The URL of the ALB
+    Value: !GetAtt ALB.DNSName
+
+
+
+        
+
+
+
+ 

@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Infra configuration Next Step EC2 systemmanger Configure
+Metadata: #파라미터들의 그룹들을 Label 작업
+  AWS::CloudFormation::Interface: 
+    ParameterGroups:          
+      - 
+        Label: 
+          default: "Amazon EC2 Configuration"
+        Parameters:
+          - Sub 
+          - InstanceType
+          - sg
+          - AMI
+Mappings:
+  Regionmap:  
+    ap-northeast-2:
+      Linux2: ami-0f2c95e9fe3f8f80e
+      window: ami-0685efd12a23690f5
+
+Parameters:
+ 
+  AMI:
+    Description: AMI of EC2
+    Type: String
+    Default: Linux2
+    AllowedValues:
+      - Linux2
+      - window
+
+  sg:  # 보안그룹 선택(Select to your sg)
+    Type: AWS::EC2::SecurityGroup::Id
+  
+  Sub:  # 서브넷 선택(Select to your subnet)
+    Description: Cidr Block for Subnet
+    Type: AWS::EC2::Subnet::Id
+   
+  InstanceType: #인스턴스 타입
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - r3.large
+      - r3.xlarge
+  
+
+Resources:
+  
+  ssmIAMRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+      Description: Create Formation Ec2 Role
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      RoleName: EC2SSM-CreateFormation
+  webinstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - !Ref ssmIAMRole
+  
+  webserver:
+    Type: AWS::EC2::Instance
+    Properties:
+<<<<<<< HEAD
+=======
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
+>>>>>>> main
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]  
+      KeyName: !Ref KeyName
+      SecurityGroupIds: 
+      - !Ref sg
+      SubnetId: !Ref sub
+      UserData:
+        !Base64 |
+        #!/bin/bash -ex
+        amazon-linux-extras install -y epel
+        yum install -y  httpd git php stress
+        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
+        cp /FormationtoAWS/index.php /var/www/html/index.php
+        systemctl enable httpd
+        systemctl start httpd 
+
+      Tags:
+      - 
+        Key: Name
+        Value: webserver
+         
+  
+Outputs:
+  InstanceID:
+    Description: The Instance ID
+    Value: !Ref webserver
