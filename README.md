@@ -17,6 +17,7 @@ VPC-EC2.yml : VPC configuration and test EC2 (bastion and webserver)
 
 
 
+
 **# 개별 서버들에 대해서 CloudWatch Metric에 따른 SNS 알람 트리거 방식의 템플릿이다.               
 **monitoring.yml : CloudWatch Metric Alert configuration 
 
@@ -24,8 +25,12 @@ VPC-EC2.yml : VPC configuration and test EC2 (bastion and webserver)
 
 
 
+
+
 **# 계정간의 CrossAccount role를 통해 관리하고자 하는 계정을 해당 Role을 배포해주어 관리자의 계정에서 언제든 SwitchRole할수있다.                 
 **Crossaccount.yml  : Crossaccount assume Role configuration
+
+
 
 
 
@@ -43,3 +48,8 @@ VPC-EC2.yml : VPC configuration and test EC2 (bastion and webserver)
 **Loadbalancer-step adjustment.yml : Loadbalncer and Autoscaling Configuration 
 
 
+
+
+ㅁ
+
+ㅁ
