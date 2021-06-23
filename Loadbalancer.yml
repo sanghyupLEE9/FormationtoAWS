@@ -46,16 +46,22 @@ Parameters:
   VPC:
     Description: Select your VPC 
     Type: AWS::EC2::VPC::Id 
-  ELBSubnets:
+  ELBSubnets: #List를 이용한 다중 Subnet 선택
     Type: List<AWS::EC2::Subnet::Id>
     Description: select your subnets 
     
-  ASGSubnets:
+  ASGSubnets: #ASG을 구성할 private subnet의 다중 선택
     Description: select your subnets 
     Type: List<AWS::EC2::Subnet::Id>
+<<<<<<< HEAD
   ASGsg:
     Type: AWS::EC2::SecurityGroup::Id
     Description: select your security Group (ec2 used)
+=======
+  ASGsg: # sg그룹의 종류를 나열하여 그중 EC2 인스턴스에게 지정할 Sg
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: select your sg (ec2 used)
+>>>>>>> main
 
 
 Resources:
@@ -168,7 +174,7 @@ Resources:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       AutoScalingGroupName: !Ref ASG
-      PolicyType: TargetTrackingScaling
+      PolicyType: TargetTrackingScaling   #대상 추적 조정 정책 생성
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization

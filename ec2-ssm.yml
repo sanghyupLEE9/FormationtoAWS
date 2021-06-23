@@ -9,7 +9,6 @@ Metadata: #파라미터들의 그룹들을 Label 작업
         Parameters:
           - Sub 
           - InstanceType
-          - KeyName
           - sg
           - AMI
 Mappings:
@@ -20,10 +19,6 @@ Mappings:
 
 Parameters:
  
-  KeyName: #자신의 리전의 있는 keypair 사용하도록 지정
-    Description: Name of KeyPair
-    Type: AWS::EC2::KeyPair::KeyName
-
   AMI:
     Description: AMI of EC2
     Type: String
@@ -101,6 +96,10 @@ Resources:
   webserver:
     Type: AWS::EC2::Instance
     Properties:
+<<<<<<< HEAD
+=======
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
+>>>>>>> main
       InstanceType: !Ref InstanceType
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]  
       KeyName: !Ref KeyName
