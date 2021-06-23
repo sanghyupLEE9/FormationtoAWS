@@ -68,7 +68,6 @@ Parameters:
   
 
 Resources:
-  
   ssmIAMRole:
     Type: "AWS::IAM::Role"
     Properties: 
@@ -96,10 +95,7 @@ Resources:
   webserver:
     Type: AWS::EC2::Instance
     Properties:
-<<<<<<< HEAD
-=======
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI] 
->>>>>>> main
       InstanceType: !Ref InstanceType
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]  
       KeyName: !Ref KeyName
