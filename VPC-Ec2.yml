@@ -116,14 +116,7 @@ Parameters:
     Default: 0.0.0.0/0
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
-    ### 콘솔에서 선택 방식 ####
-  # AZ1:  
-  #  Type: AWS::EC2::AvailabilityZone::Name
-  #  Description: select of the AvailabilityZone
-  # AZ2:
-  #  Type: AWS::EC2::AvailabilityZone::Name
-  #  Description: select of the AvailabilityZone
-
+ 
 
 Resources:
 ########### VPC ####################
