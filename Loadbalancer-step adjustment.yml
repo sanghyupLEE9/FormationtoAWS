@@ -199,10 +199,11 @@ Resources:
       MetricAggregationType: Average
       EstimatedInstanceWarmup: 60
       StepAdjustments:
-         # 30 미만구간으로 다운시 2개감소
-          MetricIntervalUpperBound: -10
+         # 20 미만구간으로 다운시 2개감소
+        - MetricIntervalUpperBound: -10
           ScalingAdjustment: -2
-        - MetricIntervalLowerBound: -10 # 30 ~ 40 구간시 1개감소
+         
+        - MetricIntervalLowerBound: -10 # 30 ~ 20 구간시 1개감소
           MetricIntervalUpperBound:  0
           ScalingAdjustment: -1
   #########################################################
@@ -256,6 +257,7 @@ Resources:
       Statistic: Average
       MetricName: CPUUtilization
       Namespace: AWS/EC2
+      AlarmName: CPULowScaling
       AlarmActions:
         - !Ref SNSTopic
         - !Ref EC2Scaledownpolicy
