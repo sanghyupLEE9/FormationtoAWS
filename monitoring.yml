@@ -35,6 +35,11 @@ Parameters:
 
 
 Resources:
+  #########################################################
+  #                                                       #
+  #                        SNS                            #
+  #                                                       #    
+  #########################################################
   SNSTopic: #생성할 주제 및 구독
     Type: AWS::SNS::Topic
     Properties:
@@ -45,7 +50,11 @@ Resources:
       Subscription: #구독 생성
       - Endpoint: !Ref OperatorEMail
         Protocol: email
-  
+  #########################################################
+  #                                                       #
+  #                        Alarm                          #
+  #                                                       #    
+  #########################################################
   Ec2cpuAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:

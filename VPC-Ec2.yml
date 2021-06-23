@@ -116,13 +116,7 @@ Parameters:
     Default: 0.0.0.0/0
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
-    ### 콘솔에서 선택 방식 ####
-  # AZ1:  
-  #  Type: AWS::EC2::AvailabilityZone::Name
-  #  Description: select of the AvailabilityZone
-  # AZ2:
-  #  Type: AWS::EC2::AvailabilityZone::Name
-  #  Description: select of the AvailabilityZone
+
 
 
 Resources:
@@ -296,44 +290,44 @@ Resources:
         SourceSecurityGroupId: !Ref sshsecurity
      
 ############# instnace #####################
-  webserver:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]   #위의 Mappings 데이터에서 Regionmap에 대한 속성값 추출 그중 AMI 참조 AWS::Region참조시 자동으로 사용리전 적용
-      KeyName: !Ref KeyName
-      SecurityGroupIds: 
-      - !Ref websecurity
-      SubnetId: !Ref PrivateSubnet1
-      UserData:
-        !Base64 |
-        #!/bin/bash -ex
-        amazon-linux-extras install -y epel
-        yum install -y  httpd git php stress
-        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
-        cp /FormationtoAWS/index.php /var/www/html/index.php
-        systemctl enable httpd
-        systemctl start httpd 
+  # webserver:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     InstanceType: !Ref InstanceType
+  #     ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]   #위의 Mappings 데이터에서 Regionmap에 대한 속성값 추출 그중 AMI 참조 AWS::Region참조시 자동으로 사용리전 적용
+  #     KeyName: !Ref KeyName
+  #     SecurityGroupIds: 
+  #     - !Ref websecurity
+  #     SubnetId: !Ref PrivateSubnet1
+  #     UserData:
+  #       !Base64 |
+  #       #!/bin/bash -ex
+  #       amazon-linux-extras install -y epel
+  #       yum install -y  httpd git php stress
+  #       git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
+  #       cp /FormationtoAWS/index.php /var/www/html/index.php
+  #       systemctl enable httpd
+  #       systemctl start httpd 
 
-      Tags:
-      - 
-        Key: Name
-        Value: webserver
+  #     Tags:
+  #     - 
+  #       Key: Name
+  #       Value: webserver
 
 
-  bastion:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]
-      KeyName: !Ref KeyName
-      SecurityGroupIds: 
-      - !Ref sshsecurity
-      SubnetId: !Ref PublicSubnet1
-      Tags:
-      - 
-        Key: Name
-        Value: bastion
+  # bastion:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     InstanceType: !Ref InstanceType
+  #     ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', !Ref AMI]
+  #     KeyName: !Ref KeyName
+  #     SecurityGroupIds: 
+  #     - !Ref sshsecurity
+  #     SubnetId: !Ref PublicSubnet1
+  #     Tags:
+  #     - 
+  #       Key: Name
+  #       Value: bastion
   
 
   

@@ -55,10 +55,14 @@ Parameters:
     Type: List<AWS::EC2::Subnet::Id>
   ASGsg:
     Type: AWS::EC2::SecurityGroup::Id
-    Description: select your security Group (ec2 used)
-
+    Description: select your sg (ec2 used)
+  OperatorEMail: #구독 알림을 요청할 이메일 (ex. 관리자)
+    Description: write your email
+    Type: String
+    AllowedPattern: ([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)
 
 Resources:
+
   #########################################################
   #                                                       #
   #                         ALB                           #
@@ -118,7 +122,7 @@ Resources:
       UnhealthyThresholdCount: 2
   #########################################################
   #                                                       #
-  #                         ASG                           #
+  #                    AutoScaling                        #
   #                                                       #    
   #########################################################
   LaunchConf:
@@ -158,21 +162,107 @@ Resources:
         - !Ref ALBTargetGroup
       HealthCheckGracePeriod: 300
       HealthCheckType: ELB
+      NotificationConfigurations:
+      - TopicARN: !Ref SNSTopic
+        NotificationTypes:
+          - autoscaling:EC2_INSTANCE_LAUNCH
+          - autoscaling:EC2_INSTANCE_LAUNCH_ERROR
+          - autoscaling:EC2_INSTANCE_TERMINATE
+          - autoscaling:EC2_INSTANCE_TERMINATE_ERROR
       Tags:
         - Key: Name
           PropagateAtLaunch: true
           Value: web-asg
         
 
-  Ec2policy:
+  EC2Scaleuppolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       AutoScalingGroupName: !Ref ASG
-      PolicyType: TargetTrackingScaling
-      TargetTrackingConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 5
+      AdjustmentType: ChangeInCapacity
+      PolicyType: StepScaling
+      MetricAggregationType: Average
+      EstimatedInstanceWarmup: 60
+      StepAdjustments:
+        - MetricIntervalLowerBound: 0   #40~ 60 일때 1개 증가
+          MetricIntervalUpperBound: 20
+          ScalingAdjustment: 1
+        - MetricIntervalLowerBound: 20 # 60 ~ 일때 2개 증가
+          ScalingAdjustment: 2
+  
+  EC2Scaledownpolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref ASG
+      AdjustmentType: ChangeInCapacity
+      PolicyType: StepScaling
+      MetricAggregationType: Average
+      EstimatedInstanceWarmup: 60
+      StepAdjustments:
+         # 30 미만구간으로 다운시 2개감소
+          MetricIntervalUpperBound: -10
+          ScalingAdjustment: -2
+        - MetricIntervalLowerBound: -10 # 30 ~ 40 구간시 1개감소
+          MetricIntervalUpperBound:  0
+          ScalingAdjustment: -1
+  #########################################################
+  #                                                       #
+  #                         SNS                           #
+  #                                                       #    
+  #########################################################
+  SNSTopic: #생성할 주제 및 구독
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${EnvironmentName}SNS_testing
+      FifoTopic: false
+      TopicName: !Sub ${EnvironmentName}Topic
+      # KmsMasterKeyId: 
+      Subscription: #구독 생성
+      - Endpoint: !Ref OperatorEMail
+        Protocol: email
+  #########################################################
+  #                                                       #
+  #                         Alarm                         #
+  #                                                       #    
+  #########################################################
+  CPUHigh:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Scale-up if CPU is greater than 40% for 10 minutes
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: '2' # 지정된 시간의 반복횟수
+      AlarmActions:
+        - !Ref SNSTopic
+        - !Ref EC2Scaleuppolicy
+      AlarmName: CPUHighScaling
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Period: 300 # 검사 시간
+      Statistic: Average
+      Threshold: 40
+      TreatMissingData: missing
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref ASG
+  
+  CPULow:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Scale-down if CPU is Less than 30% for 10 minutes
+      ComparisonOperator: LessThanThreshold
+      EvaluationPeriods: 2
+      Period: 300
+      Threshold: 30
+      Statistic: Average
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      AlarmActions:
+        - !Ref SNSTopic
+        - !Ref EC2Scaledownpolicy
+      TreatMissingData: missing
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref ASG
 
 
         
