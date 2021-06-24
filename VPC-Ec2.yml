@@ -257,7 +257,7 @@ Resources:
   sshsecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Test
+      GroupDescription: allow ssh
       GroupName: !Sub ${EnvironmentName} ssh-security
       VpcId:
         !Ref VPC
@@ -270,7 +270,7 @@ Resources:
   websecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Test
+      GroupDescription: allow http and ssh
       GroupName: !Sub ${EnvironmentName} web-security
       VpcId:
         !Ref VPC
@@ -283,6 +283,19 @@ Resources:
         FromPort: 22
         ToPort: 22
         SourceSecurityGroupId: !Ref sshsecurity
+
+  DBaccess:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow webserver
+      GroupName: !Sub ${EnvironmentName}DBSG
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: TCP
+        FromPort: 3306
+        ToPort: 3306
+        SourceSecurityGroupId: !Ref websecurity
+
      
 ############# instnace #####################
   bastion:
