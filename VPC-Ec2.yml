@@ -31,9 +31,6 @@ Mappings:
     
           
 Parameters:   
-  AZ:
-    Type: AWS::EC2::Availability
-    Description: Choose your az
   EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
     Description: A common name for your resources
     Type: String 
