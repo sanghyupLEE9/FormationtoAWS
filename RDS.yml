@@ -1,0 +1,138 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Infra configuration Next Step EC2 systemmanger Configure
+
+
+
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - 
+        Label:
+          default: DB subnet Group
+        parameters:
+          - Subnets 
+
+      - 
+        Label:
+          default: DB Configuration
+        parameters:
+          - SG
+          - instanceclass
+          - Engine
+          - Version
+          - DBinstnaceID
+          - DBname
+          - password
+          - DBusername
+          - DBstorage
+          - Multi-AZ
+          
+Parameters:
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: select your subnets 
+  SG:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: choose DB SG
+  instanceclass:
+    Type: String
+    Description: DB instance Class
+    ConstraintDescription: Must select a valid DB instance type.
+    Default: "db.t3.micro"
+    AllowedValues:
+      - "db.r5.large"
+      - "db.r5.xlarge"
+      - "db.r5.2xlarge"
+      - "db.t3.micro"
+      - "db.t3.small"
+      - "db.t3.medium"
+      - "db.t3.large"
+      - "db.t3.xlarge"
+      - "db.m5.large"
+      - "db.m5.xlarge"
+      - "db.m5.2xlarge"
+      - "db.m5.4xlarge"
+  Engine:
+    Type: String
+    Description: Selet create your DB Engine
+    Default: mysql
+    AllowedValues:
+      - "mysql"    
+      - "aurora "    
+      - "aurora-mysql"    
+      - "aurora-postgresql"
+      - "mariadb"
+      - "oracle-ee"
+      - "oracle-se2"
+      - "oracle-se1"
+      - "oracle-se"
+      - "postgres"
+      - "sqlserver-ee"
+      - "sqlserver-se"
+      - "sqlserver-ex"
+      - "sqlserver-web"
+  Version:
+    Type: String
+    Description: Select yout Engine Version 
+    Default: MySQL 8.0.25
+    AllowedValues:
+      - "MySQL 8.0.25"
+      - "MySQL 8.0.23"
+      - "MySQL 8.0.21"
+      - "MySQL 5.7.33"
+      - "MySQL 5.7.31"
+      - "MySQL 5.7.30"
+      - "MariaDB 10.5.8"
+      - "MariaDB 10.4.13"
+      - "MariaDB 10.3.28"
+      - "MariaDB 10.3.23"
+      - "MariaDB 10.2.37"
+      - "MariaDB 10.2.32"
+  DBinstnaceID:
+    Type: String
+    Default: mydbinstance
+    MinLength: '1'
+    MaxLength: '63'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: Must begin with a letter and must not end with a hyphen or contain two consecutive hyphens.
+  DBname:
+    Default: mydb
+    Description: My database
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
+  DBUsername:
+    NoEcho: 'true'
+    Description: Username for MySQL database access
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    NoEcho: 'true'
+    Description: Password MySQL database access
+    Type: String
+    MinLength: '8'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: must contain only alphanumeric characters.
+
+Resources:
+  Dbsubnetgroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Create your DB subnets
+      SubnetIds:
+        - !Select [0,!Ref Subnets]
+        - !Select [1,!Ref Subnets]
+      DBSubnetGroupName: DBSubnets
+ 
+
+
+      
+
+
