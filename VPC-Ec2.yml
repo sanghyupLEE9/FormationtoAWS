@@ -304,10 +304,10 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
-			KeyName: !Ref KeyName
+      KeyName: !Ref KeyName
       AvailabilityZone: !GetAtt PublicSubnet1.AvailabilityZone
-			#GetAtt옵션을 통해서 해당 서브넷의 az속성값을 추출가능
-			#사실 서브넷의 az가 지정되어 있어 az를 별도로 지정해주지 않아도 되긴한다.
+      #GetAtt옵션을 통해서 해당 서브넷의 az속성값을 추출가능
+      #사실 서브넷의 az가 지정되어 있어 az를 별도로 지정해주지 않아도 되긴한다.
       InstanceType: t2.micro
       SubnetId: !Ref PrivateSubnet1
       SecurityGroupIds:
