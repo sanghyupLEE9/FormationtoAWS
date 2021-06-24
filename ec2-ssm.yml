@@ -104,13 +104,12 @@ Resources:
       SubnetId: !Ref Sub
       UserData:
         !Base64 |
-        #!/bin/bash -ex
-        amazon-linux-extras install -y epel
-        yum install -y  httpd git php stress
-        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
-        cp /FormationtoAWS/index.php /var/www/html/index.php
-        systemctl enable httpd
-        systemctl start httpd 
+        !Join [ "", [
+          "#!/bin/bash\n",
+          "#Install APM for Web Server\n",
+          "yum install -y mariadb* php httpd php-mysql\n",
+          "systemctl enable httpd mariadb\n",
+          "systemctl start httpd mariadb\n"] ]
 
       Tags:
       - 
