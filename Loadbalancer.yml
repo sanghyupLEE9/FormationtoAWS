@@ -136,11 +136,11 @@ Resources:
         !Base64 |
         #!/bin/bash -ex
         amazon-linux-extras install -y epel
-        yum install -y  httpd git php stress
+        yum install -y mariadb* php httpd php-mysql git stress
         git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
         cp /FormationtoAWS/index.php /var/www/html/index.php
-        systemctl enable httpd
-        systemctl start httpd 
+        systemctl enable httpd mariadb
+        systemctl start httpd mariadb
 
 
   ASG:
