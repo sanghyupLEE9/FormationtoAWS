@@ -14,21 +14,7 @@ Metadata: #파라미터들의 그룹들을 Label 작업
           - PriCIDR1
           - PriCIDR2
 
-      - 
-        Label: 
-          default: "Amazon EC2 Configuration"
-        Parameters: 
-          - InstanceType
-          - KeyName
-          - AMI
-          
-Mappings:
-  Regionmap:  
-    ap-northeast-2:
-      Linux2: ami-0f2c95e9fe3f8f80e
-      window: ami-0685efd12a23690f5
-      
-    
+
           
 Parameters:   
   EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
@@ -59,60 +45,6 @@ Parameters:
     Default: 10.0.64.0/24
   
 
-
-  InstanceType: #인스턴스 타입
-    Description: WebServer EC2 instance type
-    Type: String
-    Default: t2.micro
-    AllowedValues:
-      - t2.nano
-      - t2.micro
-      - t2.small
-      - t2.medium
-      - t2.large
-      - m4.large
-      - m4.xlarge
-      - m4.2xlarge
-      - m4.4xlarge
-      - m4.10xlarge
-      - m3.medium
-      - m3.large
-      - m3.xlarge
-      - m3.2xlarge
-      - c4.large
-      - c4.xlarge
-      - c4.2xlarge
-      - c4.4xlarge
-      - c4.8xlarge
-      - c3.large
-      - c3.xlarge
-      - c3.2xlarge
-      - c3.4xlarge
-      - c3.8xlarge
-      - r3.large
-      - r3.xlarge
-  
- 
-  AMI:
-    Description: AMI of EC2
-    Type: String
-    Default: Linux2
-    AllowedValues:
-      - Linux2
-      - window
-
-  KeyName: #자신의 리전의 있는 keypair 사용하도록 지정
-    Description: Name of KeyPair
-    Type: AWS::EC2::KeyPair::KeyName
-    
-  SSHLocation:
-    Description: The IP address range that can be used to SSH to the EC2 instances
-    Type: String
-    MinLength: '9'
-    MaxLength: '18'
-    Default: 0.0.0.0/0
-    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
-    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
 
 
 Resources:
@@ -253,51 +185,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnet2     
-############### secuirty ################# 
-  sshsecurity:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: allow ssh
-      GroupName: !Sub ${EnvironmentName} ssh-security
-      VpcId:
-        !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: !Ref SSHLocation
-     
-  websecurity:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: allow http and ssh
-      GroupName: !Sub ${EnvironmentName} web-security
-      VpcId:
-        !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        SourceSecurityGroupId: !Ref sshsecurity
-      Tag: Name
-      Value: WebSG
-  DBaccess:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: allow webserver
-      GroupName: !Sub ${EnvironmentName}DBSG
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: TCP
-        FromPort: 3306
-        ToPort: 3306
-        SourceSecurityGroupId: !Ref websecurity
-      Tag: Name
-      Value: DBSG
+
      
 
 Outputs:

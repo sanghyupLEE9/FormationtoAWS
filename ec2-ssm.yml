@@ -10,8 +10,14 @@ Metadata: #파라미터들의 그룹들을 Label 작업
           - pubSub 
           - priSub
           - InstanceType
-          - sg
           - AMI
+          - KeyName
+      - 
+        Label:
+          default: "Network config"
+        Parameters:
+          - VPC
+          
 Mappings:
   Regionmap:  
     ap-northeast-2:
@@ -19,7 +25,15 @@ Mappings:
       window: ami-0685efd12a23690f5
 
 Parameters:
- 
+  EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
+    Description: A common name for your resources
+    Type: String 
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: select having your vpc
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Select your Keypair
   AMI:
     Description: AMI of EC2
     Type: String
@@ -27,9 +41,6 @@ Parameters:
     AllowedValues:
       - Linux2
       - window
-
-  sg:  # 보안그룹 선택(Select to your sg)
-    Type: AWS::EC2::SecurityGroup::Id
   
   priSub:  # 서브넷 선택(Select to your subnet)
     Description: Cidr Block for Subnet
@@ -69,7 +80,14 @@ Parameters:
       - c3.8xlarge
       - r3.large
       - r3.xlarge
-  
+  SSHLocation:
+    Description: The IP address range that can be used to SSH to the EC2 instances
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 0.0.0.0/0
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
 
 Resources:
   
@@ -96,6 +114,56 @@ Resources:
     Properties:
       Roles:
         - !Ref ssmIAMRole
+  ############### secuirty ################# 
+  sshsecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow ssh
+      GroupName: !Sub ${EnvironmentName} ssh-security
+      VpcId:
+        !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref SSHLocation
+      Tags:
+        - Key: Name
+          Value: SSHSG
+          
+  websecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow http and ssh
+      GroupName: !Sub ${EnvironmentName} web-security
+      VpcId:
+        !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        SourceSecurityGroupId: !Ref sshsecurity
+      Tags:
+        - Key: Name
+          Value: WEBSG
+  DBaccess:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow webserver
+      GroupName: !Sub ${EnvironmentName}DBSG
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: TCP
+        FromPort: 3306
+        ToPort: 3306
+        SourceSecurityGroupId: !Ref websecurity
+      Tags:
+        - Key: Name
+          Value: DBSG
   ############# instnace #####################
   bastion:
     Type: AWS::EC2::Instance
@@ -111,14 +179,12 @@ Resources:
         Key: Name
         Value: bastion
   
-#GetAtt옵션을 통해서 해당 서브넷의 az속성값을 추출가능
-#사실 서브넷의 az가 지정되어 있어 az를 별도로 지정해주지 않아도 되긴한다.
+
   webserver:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
       KeyName: !Ref KeyName
-      AvailabilityZone: !GetAtt PublicSubnet1.AvailabilityZone
       InstanceType: t2.micro
       SubnetId: !Ref priSub
       SecurityGroupIds:
@@ -130,7 +196,7 @@ Resources:
         yum install -y mariadb* php httpd php-mysql      
         systemctl enable httpd mariadb
         systemctl start httpd mariadb
-        Tags:
+      Tags:
       - 
         Key: Name
         Value: Web Server
