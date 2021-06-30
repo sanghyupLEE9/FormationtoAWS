@@ -130,7 +130,7 @@ Resources:
       Tags:
         - Key: Name
           Value: SSHSG
-          
+
   websecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -171,6 +171,7 @@ Resources:
       InstanceType: !Ref InstanceType
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2] #위의 Mappings 데이터에서 Regionmap에 대한 속성값 추출 그중 AMI 참조 AWS::Region참조시 자동으로 사용리전 적용
       KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref webinstanceProfile
       SecurityGroupIds: 
       - !Ref sshsecurity
       SubnetId: !Ref pubSub
@@ -187,6 +188,7 @@ Resources:
       KeyName: !Ref KeyName
       InstanceType: t2.micro
       SubnetId: !Ref priSub
+      IamInstanceProfile: !Ref webinstanceProfile
       SecurityGroupIds:
         - !Ref websecurity
       UserData:
