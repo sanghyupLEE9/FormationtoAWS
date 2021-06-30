@@ -114,6 +114,7 @@ Resources:
     Properties:
       Roles:
         - !Ref ssmIAMRole
+  
   ############### secuirty ################# 
   sshsecurity:
     Type: AWS::EC2::SecurityGroup

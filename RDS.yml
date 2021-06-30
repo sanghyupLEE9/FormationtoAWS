@@ -56,7 +56,7 @@ Parameters:
   Engine:
     Type: String
     Description: Selet create your DB Engine
-    Default: mysql
+    Default: mariadb
     AllowedValues:
       - "mysql"    
       - "aurora "    
@@ -75,7 +75,7 @@ Parameters:
   Version:
     Type: String
     Description: Select yout Engine Version 
-    Default: 8.0.25
+    Default: 10.4.13
     AllowedValues:
       - "8.0.25"
       - "8.0.23"
