@@ -26,7 +26,7 @@ Metadata:
           - DBPassword
           - DBusername
           - DBstorage
-         
+          - IOPS
           
 Parameters:
   Subnets:
@@ -127,7 +127,9 @@ Parameters:
     MinValue: '100'
     MaxValue: '65536'
     ConstraintDescription: must be between 100 and 65536 GiB.
-
+  IOPS:
+    Type: String
+    Description: write your iol storage IOPS 
 
 Resources:
   Dbsubnetgroup:
@@ -140,13 +142,13 @@ Resources:
       DBSubnetGroupName: DBSubnets
   DB:
     Type: AWS::RDS::DBInstance
-    # DeletionPolicy: Retain
+    # DeletionPolicy: Retain   # 스택 삭제 시 리소스 유지 가능
     # UpdateReplacePolicy: Retain
     Properties:      
       DBInstanceClass: !Ref instanceclass
       DBInstanceIdentifier: !Ref DBinstnaceID
       DBName: !Ref DBname
-      AllocatedStorage: !Ref DBstorage
+      AllocatedStorage: !Ref MYSQLDBstorage
       Engine: !Ref Engine
       EngineVersion: !Ref Version
       MasterUsername: !Ref DBUsername
@@ -157,8 +159,11 @@ Resources:
       MultiAZ: true
       VPCSecurityGroups:
         - !Ref SG
-      AutoMinorVersionUpgrade: false
-      BackupRetentionPeriod: 0
+      AutoMinorVersionUpgrade: false #마이너 버전 자동 업그레이드 활성화
+      BackupRetentionPeriod: 1 #자동백업 0 은 비활성화
+      PreferredBackupWindow: 20:00-20:30 #백업 시간 
       StorageType: io1
-      
+      Iops: !Ref IOPS #io1 타입 스토리지 사용시 필수
+      #DeletionProtection: true #삭제 방지
+
 
