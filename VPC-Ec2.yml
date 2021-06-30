@@ -298,44 +298,44 @@ Resources:
 
      
 ############# instnace #####################
-  bastion:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2] #위의 Mappings 데이터에서 Regionmap에 대한 속성값 추출 그중 AMI 참조 AWS::Region참조시 자동으로 사용리전 적용
-      KeyName: !Ref KeyName
-      SecurityGroupIds: 
-      - !Ref sshsecurity
-      SubnetId: !Ref PublicSubnet1
-      Tags:
-      - 
-        Key: Name
-        Value: bastion
+#   bastion:
+#     Type: AWS::EC2::Instance
+#     Properties:
+#       InstanceType: !Ref InstanceType
+#       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2] #위의 Mappings 데이터에서 Regionmap에 대한 속성값 추출 그중 AMI 참조 AWS::Region참조시 자동으로 사용리전 적용
+#       KeyName: !Ref KeyName
+#       SecurityGroupIds: 
+#       - !Ref sshsecurity
+#       SubnetId: !Ref PublicSubnet1
+#       Tags:
+#       - 
+#         Key: Name
+#         Value: bastion
   
-#GetAtt옵션을 통해서 해당 서브넷의 az속성값을 추출가능
-#사실 서브넷의 az가 지정되어 있어 az를 별도로 지정해주지 않아도 되긴한다.
-  webserver:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
-      KeyName: !Ref KeyName
-      AvailabilityZone: !GetAtt PublicSubnet1.AvailabilityZone
-      InstanceType: t2.micro
-      SubnetId: !Ref PrivateSubnet1
-      SecurityGroupIds:
-        - !Ref websecurity
-      UserData:
-        Fn::Base64:
-          !Join [ "", [
-          "#!/bin/bash\n",
-          "#Install APM for Web Server\n",
-          "yum install -y mariadb* php httpd php-mysql\n",
-          "systemctl enable httpd mariadb\n",
-          "systemctl start httpd mariadb\n"] ]
-      Tags:
-      - 
-        Key: Name
-        Value: Web Server
+# #GetAtt옵션을 통해서 해당 서브넷의 az속성값을 추출가능
+# #사실 서브넷의 az가 지정되어 있어 az를 별도로 지정해주지 않아도 되긴한다.
+#   webserver:
+#     Type: AWS::EC2::Instance
+#     Properties:
+#       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
+#       KeyName: !Ref KeyName
+#       AvailabilityZone: !GetAtt PublicSubnet1.AvailabilityZone
+#       InstanceType: t2.micro
+#       SubnetId: !Ref PrivateSubnet1
+#       SecurityGroupIds:
+#         - !Ref websecurity
+#       UserData:
+#         Fn::Base64:
+#           !Join [ "", [
+#           "#!/bin/bash\n",
+#           "#Install APM for Web Server\n",
+#           "yum install -y mariadb* php httpd php-mysql\n",
+#           "systemctl enable httpd mariadb\n",
+#           "systemctl start httpd mariadb\n"] ]
+#       Tags:
+#       - 
+#         Key: Name
+#         Value: Web Server
   
 
 Outputs:

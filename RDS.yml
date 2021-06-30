@@ -23,10 +23,10 @@ Metadata:
           - Version
           - DBinstnaceID
           - DBname
-          - password
+          - DBPassword
           - DBusername
           - DBstorage
-          - Multi-AZ
+         
           
 Parameters:
   Subnets:
@@ -120,6 +120,14 @@ Parameters:
     MaxLength: '41'
     AllowedPattern: '[a-zA-Z0-9]*'
     ConstraintDescription: must contain only alphanumeric characters.
+  DBstorage:
+    Default: '50'
+    Description: The size of the database (GiB)
+    Type: Number
+    MinValue: '5'
+    MaxValue: '1024'
+    ConstraintDescription: must be between 20 and 65536 GiB.
+
 
 Resources:
   Dbsubnetgroup:
@@ -130,8 +138,20 @@ Resources:
         - !Select [0,!Ref Subnets]
         - !Select [1,!Ref Subnets]
       DBSubnetGroupName: DBSubnets
- 
-
+  DB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: !Ref instanceclass
+      DBInstanceIdentifier: !Ref DBinstnaceID
+      DBName: !Ref DBname
+      AllocatedStorage: !Ref DBstorage
+      Engine: !Ref Engine
+      EngineVersion: !Ref Version
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      MonitoringInterval: '60'
+      MonitoringRoleArn: 'arn:aws:iam::123456789012:role/rds-monitoring-role' #EnhancedMonitoring
+      
 
       
 
