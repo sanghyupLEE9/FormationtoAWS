@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: VPC Configuration
+
+Metadata: #파라미터들의 그룹들을 Label 작업
+  AWS::CloudFormation::Interface: 
+    ParameterGroups: 
+      - 
+        Label: 
+          default: "Network Configuration"
+        Parameters: 
+          - VpcCIDR
+          - PubCIDR1
+          - PubCIDR2
+          - PriCIDR1
+          - PriCIDR2
+
+
+
+
+
+Parameters:   
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC ex(10.0.0.0/16)
+    Type: String
+    Default: 10.0.0.0/16
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  PubCIDR1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.2.0/24)
+    Type: String
+    Default: 10.0.2.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PubCIDR2:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.4.0/24)
+    Type: String
+    Default: 10.0.4.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  PriCIDR1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
+    Type: String
+    Default: 10.0.32.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PriCIDR2:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
+    Type: String
+    Default: 10.0.64.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    
+    
+    
+    
+Resources:
+  # Group1. Network Resource Define
+  # 중첩 Stack VPC 
+  VPCStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/stack_vpc(cross_stack).yml'
+      Parameters:
+        VpcCIDR: !Ref VpcCIDR
+        PubCIDR1: !Ref PubCIDR1
+        PubCIDR2: !Ref PubCIDR2
+        PriCIDR1: !Ref PriCIDR1
+        PriCIDR2: !Ref PriCIDR2
