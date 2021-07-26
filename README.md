@@ -5,7 +5,7 @@
  기본적으로 VPC-EC2 파일을 받아 인프라를 구성하여 배포하여야한다.
  
 
-VPC-EC2.yml : VPC configuration and test EC2 (bastion and webserver)
+Network.yml : VPC configuration and test EC2 (bastion and webserver)
 
 
 
