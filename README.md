@@ -50,7 +50,3 @@ VPC-EC2.yml : VPC configuration and test EC2 (bastion and webserver)
 
 
 
-1.첫번째
-2.
-
-ㅁ
