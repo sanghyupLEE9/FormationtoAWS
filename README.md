@@ -46,10 +46,72 @@ CloudFormation 이란 AWS의 리소스들을 자동으로 생성해주는 IAC(In
   
 - AWSTemplateFormatVersion : 템플릿이 따르는 버전, 현재 2010-09-09 버전이 유일
 - Description: 템플릿의 설정을 기술하는 부분, 항상 템플릿 버전 다음에 정의
+
+      AWSTemplateFormatVersion: "2010-09-09"
+      Description: VPC Configuration
 - parameters: 스택 생성 및 업데이트 시 템플릿에 전달하는 값
+
+      Parameters:   
+        EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
+          Description: A common name for your resources
+          Type: String 
+
+        VpcCIDR:
+          Description: Please enter the IP range (CIDR notation) for this VPC ex(10.0.0.0/16)
+          Type: String
+          Default: 10.0.0.0/16
+          AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+        PubCIDR1:
+          Description: Please enter the IP range (CIDR notation) ex(10.0.2.0/24)
+          Type: String
+          Default: 10.0.2.0/24
+          AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+        PubCIDR2:
+          Description: Please enter the IP range (CIDR notation) ex(10.0.4.0/24)
+          Type: String
+          Default: 10.0.4.0/24
+          AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+        PriCIDR1:
+          Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
+          Type: String
+          Default: 10.0.32.0/24
+          AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+        PriCIDR2:
+          Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
+          Type: String
+          Default: 10.0.64.0/24
+          AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}' 
 - Mappings: 조건부 파라미터값을 지정하는데 사용할 수 있는 Key-Value값의 매핑 리전별로 리소스를 달리할 시 사용
+
+      Mappings:
+        Regionmap:  
+          ap-northeast-2:
+            Linux2: ami-0f2c95e9fe3f8f80e
+            window: ami-0685efd12a23690f5
 - Resources:  AWS리소스 및 해당 리소스의 속성을 지정
+
+      Resources:
+      ########### VPC ####################
+        VPC:
+          Type: AWS::EC2::VPC
+          Properties:
+            CidrBlock: !Ref VpcCIDR
+            EnableDnsHostnames: true
+              Tags:
+                - Key: Name
+                  Value: !Sub ${EnvironmentName} VPC #변수값으로 저장된 이름호출
+
+      ############### igw #####################
+        InternetGateway:
+          Type: AWS::EC2::InternetGateway
+          Properties:
+            Tags:
+              - Key: Name
+                Value: !Sub ${EnvironmentName} igw
 - Outputs: 리소스 생성 후 받을 결과에 대해 정의
+     
 - Metadata: 템플릿에 대한 추가 상세 정보 인스턴스에 대한 메타데이터나 Parameter값들에 대한 Grouping 목적으로 사용
 - Conditions: 스택 생성 또는 업데이트 시 특정 리소스 속성에 값이 할당되는지의 여부를 제어, 스택 환경이 prod인지 test인지에 따라 달라지는 리소스를 조건부로 생성 시 사용
 
