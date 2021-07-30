@@ -162,6 +162,17 @@ CloudFormation 이란 AWS의 리소스들을 자동으로 생성해주는 IAC(In
         PrivateSubnet2:
           Description: A reference to the private subnet in the 2nd Availability Zone
           Value: !Ref PrivateSubnet2
+          
+## 스택 생성 및 배포
+### CloudFormation Console S3버킷에 존재하는 Template or Local에서 업로드
+![image](https://user-images.githubusercontent.com/67955312/127629689-8a8b6724-9841-4fcb-b554-bb1aafea49fe.png)
 
 ### Formation 스택 배포 시 지정한 Parameter값을 Console에서 확인
   ![image](https://user-images.githubusercontent.com/67955312/127620152-e66062dc-76d6-4955-8bf7-f790d79d7304.png)
+
+### 이벤트를 통한 리소스 생성 확인 
+![image](https://user-images.githubusercontent.com/67955312/127629912-e9bf13bd-a339-4ca1-943a-d9b0c26f0233.png)
+
+### 배포 완료 후 Output 옵션을 지정한 결과 값 확인
+![image](https://user-images.githubusercontent.com/67955312/127630447-2f42fbaf-603d-4917-af87-d7936b510a5d.png)
+
