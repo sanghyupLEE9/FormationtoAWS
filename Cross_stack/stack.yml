@@ -11,15 +11,14 @@ Metadata: #파라미터들의 그룹들을 Label 작업
           - VpcCIDR
           - PubCIDR1
           - PubCIDR2
-          - PriCIDR1
-          - PriCIDR2
+          - PriCIDRWEB1
+          - PriCIDRWEB2
+          - PriCIDRDB1
+          - PriCIDRDB2
 
 
-
-
-
+          
 Parameters:   
-
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC ex(10.0.0.0/16)
     Type: String
@@ -37,12 +36,22 @@ Parameters:
     Default: 10.0.4.0/24
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
-  PriCIDR1:
+  PriCIDRWEB1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
+    Type: String
+    Default: 10.0.8.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PriCIDRWEB2:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
+    Type: String
+    Default: 10.0.16.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PriCIDRDB1:
     Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
     Type: String
     Default: 10.0.32.0/24
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-  PriCIDR2:
+  PriCIDRDB2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
     Type: String
     Default: 10.0.64.0/24
@@ -62,5 +71,7 @@ Resources:
         VpcCIDR: !Ref VpcCIDR
         PubCIDR1: !Ref PubCIDR1
         PubCIDR2: !Ref PubCIDR2
-        PriCIDR1: !Ref PriCIDR1
-        PriCIDR2: !Ref PriCIDR2
+        PriCIDRWEB1: !Ref PriCIDRWEB1
+        PriCIDRWEB2: !Ref PriCIDRWEB2
+        PriCIDRDB1: !Ref PriCIDRDB1
+        PriCIDRDB2: !Ref PriCIDRDB2
