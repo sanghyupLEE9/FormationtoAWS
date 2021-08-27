@@ -18,16 +18,22 @@ Parameters:
   PubCIDR2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.4.0/24)
     Type: String
-   
 
-  PriCIDR1:
+  PriCIDRWEB1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.8.0/24)
+    Type: String
+   
+  PriCIDRWEB2:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.16.0/24)
+    Type: String
+    
+  PriCIDRDB1:
     Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
     Type: String
    
-  PriCIDR2:
+  PriCIDRDB2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
-    Type: String
-   
+    Type: String 
 
 
 
@@ -40,17 +46,15 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-VPC 
-          
+          Value: !Sub ${EnvironmentName} VPC #변수값으로 저장된 이름호출
 
 ############### igw #####################
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-    DependsOn: VPC
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-igw
+          Value: !Sub ${EnvironmentName} igw
 
   Attachigw:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -71,7 +75,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-Public Subnet 1
+          Value: !Sub ${EnvironmentName} Public Subnet 1
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -82,34 +86,57 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-Public Subnet 2
+          Value: !Sub ${EnvironmentName} Public Subnet 2
 
-  PrivateSubnet1:
+  PrivateSubnetWEB1:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
     Properties:
       VpcId: !Ref VPC
       AvailabilityZone: !Select [ 0, !GetAZs ]
-      CidrBlock: !Ref PriCIDR1
+      CidrBlock: !Ref PriCIDRWEB1
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-Private Subnet 1
-  PrivateSubnet2:
+          Value: !Sub ${EnvironmentName} Private SubnetWEB1
+  PrivateSubnetWEB2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
     Properties:
       VpcId: !Ref VPC
       AvailabilityZone: !Select [ 2, !GetAZs ]
-      CidrBlock: !Ref PriCIDR2
+      CidrBlock: !Ref PriCIDRWEB2
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-Private Subnet2
+          Value: !Sub ${EnvironmentName} Private SubnetWEB2
+  PrivateSubnetDB1:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      CidrBlock: !Ref PriCIDRDB1
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private SubnetDB1
+  PrivateSubnetDB2:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs ]
+      CidrBlock: !Ref PriCIDRDB2
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private SubnetDB2
 ################ EIP NAT  ##############
   NatGatewayEIP:
     Type: AWS::EC2::EIP
     DependsOn: VPC
+    DependsOn: Attachigw
     Properties:
       Domain: vpc    
 
@@ -121,7 +148,7 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-NAT
+          Value: !Sub ${EnvironmentName} NAT
 ############ Routing Table ##############
 
   PublicRouteTable:
@@ -131,7 +158,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-PublicRT
+          Value: !Sub ${EnvironmentName} PublicRT
           
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
@@ -140,8 +167,10 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}-PrivateRT
-
+          Value: !Sub ${EnvironmentName} PrivateRT
+ 
+ 
+        
   PublicRoute:
     Type: AWS::EC2::Route
     DependsOn: [Attachigw, PublicRouteTable,InternetGateway]
@@ -168,43 +197,62 @@ Resources:
 
   PrivateRoute:
     Type: AWS::EC2::Route
-    DependsOn: [PrivateRouteTable, PrivateRouteTable, NatGateway]
+    DependsOn: [PrivateRouteTable, NatGateway]
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway
   
-  PrivateSubnet1RouteTableAssociation:
+  PrivateSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
-    DependsOn: [PrivateRouteTable, PrivateRouteTable, NatGateway,PrivateRoute]
+    DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
     Properties:
       RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet1
+      SubnetId: !Ref PrivateSubnetWEB1
 
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
-    DependsOn: [PrivateRouteTable, PrivateRouteTable, NatGateway,PrivateRoute]
+    DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
     Properties:
       RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet2     
+      SubnetId: !Ref PrivateSubnetWEB2     
 
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetDB1
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetDB2     
      
 
 Outputs:
-  VPCID:
+  VPC:
     Description: A reference to the created VPC
     Value: !Ref VPC
 
-  PublicSubnet1ID:
+  PublicSubnet1:
     Description: A reference to the public subnet in the 1st Availability Zone
     Value: !Ref PublicSubnet1
-  PublicSubnet2ID:
+  PublicSubnet2:
     Description: A reference to the public subnet in the 2nd Availability Zone
     Value: !Ref PublicSubnet2
 
-  PrivateSubnet1ID:
+  PrivateSubnet1:
     Description: A reference to the private subnet in the 1st Availability Zone
-    Value: !Ref PrivateSubnet1
-  PrivateSubnet2ID:
+    Value: !Ref PrivateSubnetWEB1
+  PrivateSubnet2:
     Description: A reference to the private subnet in the 2nd Availability Zone
-    Value: !Ref PrivateSubnet2
+    Value: !Ref PrivateSubnetWEB2
+  PrivateSubnet1:
+    Description: A reference to the private subnet in the 1st Availability Zone
+    Value: !Ref PrivateSubnetDB1
+  PrivateSubnet2:
+    Description: A reference to the private subnet in the 2nd Availability Zone
+    Value: !Ref PrivateSubnetDB2
