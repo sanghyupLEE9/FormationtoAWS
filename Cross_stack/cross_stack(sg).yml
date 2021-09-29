@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Security group stack
+          
+
+Parameters:
+  VPCID:
+    Type: string
+    Description: sg attach vpc
+
+Resources:
+  
+  
+  ############### secuirty ################# 
+  sshsecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow ssh
+      GroupName: ssh-security
+      VpcId:
+        !Ref VPCID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref SSHLocation
+      Tags:
+        - Key: Name
+          Value: SSHSG
+        - key: stackName
+          value: !Ref 'AWS::StackName'
+  
+  ELBsecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow http and https
+      GroupName: ELB-security
+      VpcId:
+        !Ref VPCID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443 
+        ToPort: 443
+        Cidrip: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: WEBSG
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
+  websecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow http and ssh
+      GroupName:  web-security
+      VpcId:
+        !Ref VPCID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        SourceSecurityGroupIds: 
+         - !Ref sshsecurity
+         - !Ref ELBsecurity
+      Tags:
+        - Key: Name
+          Value: WEBSG
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
+  DBaccess:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow webserver
+      GroupName: DBSG
+      VpcId: !Ref VPCID
+      SecurityGroupIngress:
+      - IpProtocol: TCP
+        FromPort: 3306
+        ToPort: 3306
+        SourceSecurityGroupId: !Ref websecurity
+      Tags:
+        - Key: Name
+          Value: DBSG
+        - Key: stackName
+          Value: !Ref 'AWS::StackName'
+         
+
+Outputs:
+  websecurity:
+    Description: web sercurity group
+    Value: !Ref websecurity 
+  DBsecurity:
+    Description: web sercurity group
+    Value: !Ref DBaccess
+  sshsecurity:
+    Description: web sercurity group
+    Value: !Ref sshsecurity              
+  ELBsecurity:
+    Description: ELB security group
+    Value: !Ref ELBsecurity
+
+        

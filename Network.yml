@@ -19,10 +19,6 @@ Metadata: #파라미터들의 그룹들을 Label 작업
 
           
 Parameters:   
-  EnvironmentName: #변수값으로 저장하여 리소스들의 공통된 네임 지정
-    Description: A common name for your resources
-    Type: String 
-
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC ex(10.0.0.0/16)
     Type: String
@@ -72,17 +68,21 @@ Resources:
       CidrBlock: !Ref VpcCIDR
       EnableDnsHostnames: true
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} VPC #변수값으로 저장된 이름호출
-
+          Value: VPC 10.0.0.0/16
+        
 ############### igw #####################
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
+        - Key: CFN Stack 
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} igw
-
+          Value: igw
+        
   Attachigw:
     Type: AWS::EC2::VPCGatewayAttachment
     DependsOn: [VPC,InternetGateway ]
@@ -101,8 +101,11 @@ Resources:
       CidrBlock: !Ref PubCIDR1
       MapPublicIpOnLaunch: true
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet 1
+          Value: pubsub1
+        
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -112,9 +115,11 @@ Resources:
       CidrBlock: !Ref PubCIDR2
       MapPublicIpOnLaunch: true
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet 2
-
+          Value: pubsub2
+        
   PrivateSubnetWEB1:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -124,8 +129,11 @@ Resources:
       CidrBlock: !Ref PriCIDRWEB1
       MapPublicIpOnLaunch: false
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetWEB1
+          Value: priWEB1
+        
   PrivateSubnetWEB2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -135,8 +143,11 @@ Resources:
       CidrBlock: !Ref PriCIDRWEB2
       MapPublicIpOnLaunch: false
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetWEB2
+          Value: priWEB2
+        
   PrivateSubnetDB1:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -146,8 +157,11 @@ Resources:
       CidrBlock: !Ref PriCIDRDB1
       MapPublicIpOnLaunch: false
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetDB1
+          Value: priDB1
+        
   PrivateSubnetDB2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -157,8 +171,11 @@ Resources:
       CidrBlock: !Ref PriCIDRDB2
       MapPublicIpOnLaunch: false
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetDB2
+          Value: priDB2
+        
 ################ EIP NAT  ##############
   NatGatewayEIP:
     Type: AWS::EC2::EIP
@@ -174,8 +191,11 @@ Resources:
       AllocationId: !GetAtt NatGatewayEIP.AllocationId
       SubnetId: !Ref PublicSubnet1
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} NAT
+          Value: NAT
+        
 ############ Routing Table ##############
 
   PublicRouteTable:
@@ -184,18 +204,22 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} PublicRT
-          
+          Value: pubRT
+        
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     DependsOn: VPC
     Properties:
       VpcId: !Ref VPC
       Tags:
+        - Key: CFN Stack
+          Value: !Ref 'AWS::StackName'
         - Key: Name
-          Value: !Sub ${EnvironmentName} PrivateRT
- 
+          Value: priRT
+        
  
         
   PublicRoute:

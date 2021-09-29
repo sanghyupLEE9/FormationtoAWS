@@ -46,19 +46,21 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} VPC #변수값으로 저장된 이름호출
-
+          Value: VPC #변수값으로 저장된 이름호출
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
 ############### igw #####################
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} igw
-
+          Value: igw
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
   Attachigw:
     Type: AWS::EC2::VPCGatewayAttachment
-    DependsOn: [VPC,InternetGateway ]
+    DependsOn: [VPC, InternetGateway ]
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
@@ -75,7 +77,9 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet 1
+          Value: Public Subnet 1
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -86,8 +90,9 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet 2
-
+          Value: Public Subnet 2
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
   PrivateSubnetWEB1:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -98,7 +103,9 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetWEB1
+          Value: Private SubnetWEB1
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
   PrivateSubnetWEB2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -109,7 +116,9 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetWEB2
+          Value: Private SubnetWEB2
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
   PrivateSubnetDB1:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -120,7 +129,9 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetDB1
+          Value: Private SubnetDB1
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
   PrivateSubnetDB2:
     Type: AWS::EC2::Subnet
     DependsOn: VPC
@@ -131,7 +142,9 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private SubnetDB2
+          Value: Private SubnetDB2
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
 ################ EIP NAT  ##############
   NatGatewayEIP:
     Type: AWS::EC2::EIP
@@ -148,7 +161,9 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} NAT
+          Value: NAT
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
 ############ Routing Table ##############
 
   PublicRouteTable:
@@ -158,7 +173,9 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} PublicRT
+          Value: PublicRT
+        - key: stackName
+          Value: !Ref 'AWS::StackName'
           
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
@@ -167,8 +184,9 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} PrivateRT
- 
+          Value: PrivateRT
+        - key: stackName
+          Value: !Ref 'AWS::StackName' 
  
         
   PublicRoute:
@@ -233,7 +251,7 @@ Resources:
      
 
 Outputs:
-  VPC:
+  VPCID:
     Description: A reference to the created VPC
     Value: !Ref VPC
 

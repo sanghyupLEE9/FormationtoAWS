@@ -66,7 +66,7 @@ Resources:
   VPCStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
-      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/stack_vpc(cross_stack).yml'
+      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack/stack_vpc(cross_stack).yml' 
       Parameters:
         VpcCIDR: !Ref VpcCIDR
         PubCIDR1: !Ref PubCIDR1
@@ -75,3 +75,12 @@ Resources:
         PriCIDRWEB2: !Ref PriCIDRWEB2
         PriCIDRDB1: !Ref PriCIDRDB1
         PriCIDRDB2: !Ref PriCIDRDB2
+  SGstack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack/cross_stack(sg).yml'
+      Parameters:
+        VPCID:
+          Fn::GetAtt:
+          - VPCStack
+          - Outputs.VPCID         
