@@ -26,7 +26,7 @@ Resources:
       Tags:
         - Key: Name
           Value: SSHSG
-        - key: stackName
+        - Key: stackName
           value: !Ref 'AWS::StackName'
   
   ELBsecurity:
@@ -48,7 +48,7 @@ Resources:
       Tags:
         - Key: Name
           Value: WEBSG
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   websecurity:
     Type: AWS::EC2::SecurityGroup
@@ -71,7 +71,7 @@ Resources:
       Tags:
         - Key: Name
           Value: WEBSG
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   DBaccess:
     Type: AWS::EC2::SecurityGroup

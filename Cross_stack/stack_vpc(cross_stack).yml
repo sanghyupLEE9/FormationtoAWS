@@ -47,7 +47,7 @@ Resources:
       Tags:
         - Key: Name
           Value: VPC #변수값으로 저장된 이름호출
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
 ############### igw #####################
   InternetGateway:
@@ -56,7 +56,7 @@ Resources:
       Tags:
         - Key: Name
           Value: igw
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   Attachigw:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -78,7 +78,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Public Subnet 1
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   PublicSubnet2:
     Type: AWS::EC2::Subnet
@@ -91,7 +91,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Public Subnet 2
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetWEB1:
     Type: AWS::EC2::Subnet
@@ -104,7 +104,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Private SubnetWEB1
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetWEB2:
     Type: AWS::EC2::Subnet
@@ -117,7 +117,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Private SubnetWEB2
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetDB1:
     Type: AWS::EC2::Subnet
@@ -130,7 +130,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Private SubnetDB1
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetDB2:
     Type: AWS::EC2::Subnet
@@ -143,7 +143,7 @@ Resources:
       Tags:
         - Key: Name
           Value: Private SubnetDB2
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
 ################ EIP NAT  ##############
   NatGatewayEIP:
@@ -162,7 +162,7 @@ Resources:
       Tags:
         - Key: Name
           Value: NAT
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
 ############ Routing Table ##############
 
@@ -174,7 +174,7 @@ Resources:
       Tags:
         - Key: Name
           Value: PublicRT
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName'
           
   PrivateRouteTable:
@@ -185,7 +185,7 @@ Resources:
       Tags:
         - Key: Name
           Value: PrivateRT
-        - key: stackName
+        - Key: stackName
           Value: !Ref 'AWS::StackName' 
  
         
