@@ -4,7 +4,7 @@ Description: Security group stack
 
 Parameters:
   VPCID:
-    Type: string
+    Type: String
     Description: sg attach vpc
 
 Resources:
