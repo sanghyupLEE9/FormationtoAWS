@@ -169,33 +169,33 @@ Resources:
         Value: bastion
   
 
-  webserver:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
-      KeyName: !Ref KeyName
-      InstanceType: t2.micro
-      SubnetId: !Ref priSub
-      IamInstanceProfile: !Ref webinstanceProfile
-      SecurityGroupIds:
-        - !Ref websecurity
-      UserData:
-        !Base64 |
-        #!/bin/bash -ex
-        amazon-linux-extras install -y epel
-        yum install -y mariadb* php httpd php-mysql      
-        systemctl enable httpd mariadb
-        systemctl start httpd mariadb
-      Tags:
-      - 
-        Key: Name
-        Value: Web Server
+#   webserver:
+#     Type: AWS::EC2::Instance
+#     Properties:
+#       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
+#       KeyName: !Ref KeyName
+#       InstanceType: t2.micro
+#       SubnetId: !Ref priSub
+#       IamInstanceProfile: !Ref webinstanceProfile
+#       SecurityGroupIds:
+#         - !Ref websecurity
+#       UserData:
+#         !Base64 |
+#         #!/bin/bash -ex
+#         amazon-linux-extras install -y epel
+#         yum install -y mariadb* php httpd php-mysql      
+#         systemctl enable httpd mariadb
+#         systemctl start httpd mariadb
+#       Tags:
+#       - 
+#         Key: Name
+#         Value: Web Server
   
 
-      Tags:
-      - 
-        Key: Name
-        Value: webserver
+#       Tags:
+#       - 
+#         Key: Name
+#         Value: webserver
          
   
 Outputs:
