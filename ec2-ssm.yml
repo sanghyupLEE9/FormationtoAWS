@@ -151,20 +151,7 @@ Resources:
       Tags:
         - Key: Name
           Value: WEBSG
-  DBaccess:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: allow webserver
-      GroupName: !Sub ${EnvironmentName}DBSG
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: TCP
-        FromPort: 3306
-        ToPort: 3306
-        SourceSecurityGroupId: !Ref websecurity
-      Tags:
-        - Key: Name
-          Value: DBSG
+  
   ############# instnace #####################
   bastion:
     Type: AWS::EC2::Instance
