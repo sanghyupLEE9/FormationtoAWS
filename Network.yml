@@ -268,14 +268,14 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnetWEB2     
 
-  PrivateSubnetRouteTableAssociation:
+  PrivateSubnet3RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnetDB1
 
-  PrivateSubnet2RouteTableAssociation:
+  PrivateSubnet4RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
     Properties:
@@ -301,9 +301,9 @@ Outputs:
   PrivateSubnet2:
     Description: A reference to the private subnet in the 2nd Availability Zone
     Value: !Ref PrivateSubnetWEB2
-  PrivateSubnet1:
+  PrivateSubnet3:
     Description: A reference to the private subnet in the 1st Availability Zone
     Value: !Ref PrivateSubnetDB1
-  PrivateSubnet2:
+  PrivateSubnet4:
     Description: A reference to the private subnet in the 2nd Availability Zone
     Value: !Ref PrivateSubnetDB2
