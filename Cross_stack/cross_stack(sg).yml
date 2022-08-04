@@ -4,8 +4,9 @@ Description: Security group stack
 
 Parameters:
   VPCID:
-    Type: String
+    Type: AWS::EC2::VPC::Id
     Description: sg attach vpc
+  
 
 Resources:
   
@@ -23,12 +24,12 @@ Resources:
         FromPort: 22
         ToPort: 22
         CidrIp: 0.0.0.0/0
+
       Tags:
         - Key: Name
           Value: SSHSG
-        - Key: stackName
-          value: !Ref 'AWS::StackName'
-  
+        - Key: stack
+          Value: !Ref AWS::StackName  
   ELBsecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -41,15 +42,17 @@ Resources:
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
+
       - IpProtocol: tcp
         FromPort: 443 
         ToPort: 443
-        Cidrip: 0.0.0.0/0
+        CidrIp: 0.0.0.0/0
+
       Tags:
         - Key: Name
-          Value: WEBSG
-        - Key: stackName
-          Value: !Ref 'AWS::StackName'
+          Value: exLBSG
+        - Key: stack
+          Value: !Ref AWS::StackName 
   websecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -61,18 +64,16 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-        CidrIp: 0.0.0.0/0
+        SourceSecurityGroupId: !Ref ELBsecurity
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
-        SourceSecurityGroupIds: 
-         - !Ref sshsecurity
-         - !Ref ELBsecurity
+        SourceSecurityGroupId: !Ref sshsecurity
       Tags:
         - Key: Name
           Value: WEBSG
-        - Key: stackName
-          Value: !Ref 'AWS::StackName'
+        - Key: stack
+          Value: !Ref AWS::StackName
   DBaccess:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -87,8 +88,8 @@ Resources:
       Tags:
         - Key: Name
           Value: DBSG
-        - Key: stackName
-          Value: !Ref 'AWS::StackName'
+        - Key: stack
+          Value: !Ref AWS::StackName
          
 
 Outputs:
