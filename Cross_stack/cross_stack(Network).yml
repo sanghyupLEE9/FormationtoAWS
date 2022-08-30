@@ -53,7 +53,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: VPC #변수값으로 저장된 이름호출
+          Value: CFN-VPC 
         - Key: stackName
           Value: !Ref 'AWS::StackName'
 ############### igw #####################
@@ -62,7 +62,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: igw
+          Value: CFN-igw
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   Attachigw:
@@ -84,7 +84,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: Public Subnet 1
+          Value: CFN-Pub1
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PublicSubnet2:
@@ -97,7 +97,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: Public Subnet 2
+          Value: CFN-Pub2
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetWEB1:
@@ -110,7 +110,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Private SubnetWEB1
+          Value: CFN-WEB1
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetWEB2:
@@ -123,7 +123,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Private SubnetWEB2
+          Value: CFN-WEB2
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetWAS1:
@@ -136,7 +136,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Private SubnetWAS1
+          Value: CFN-WAS1
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetWAS2:
@@ -149,7 +149,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Private SubnetWAS2
+          Value: CFN-WAS2
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetDB1:
@@ -162,7 +162,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Private SubnetDB1
+          Value: CFN-DB1
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetDB2:
@@ -175,7 +175,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: Private SubnetDB2
+          Value: CFN-DB2
         - Key: stackName
           Value: !Ref 'AWS::StackName'
 ################ EIP NAT  ##############
@@ -194,7 +194,7 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       Tags:
         - Key: Name
-          Value: NAT
+          Value: CFN-NAT
         - Key: stackName
           Value: !Ref 'AWS::StackName'
 ############ Routing Table ##############
@@ -206,7 +206,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: PublicRT
+          Value: CFN-PublicRT
         - Key: stackName
           Value: !Ref 'AWS::StackName'
           
@@ -217,7 +217,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: PrivateRT
+          Value: CFN-PrivateRT
         - Key: stackName
           Value: !Ref 'AWS::StackName' 
  
