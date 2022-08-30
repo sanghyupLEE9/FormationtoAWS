@@ -9,38 +9,57 @@ Parameters:
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC ex(10.0.0.0/16)
     Type: String
+    Default: 10.0.0.0/16
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
   PubCIDR1:
     Description: Please enter the IP range (CIDR notation) ex(10.0.1.0/24)
     Type: String
+    Default: 10.0.1.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     
   PubCIDR2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.2.0/24)
     Type: String
+    Default: 10.0.2.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
   PriCIDRWEB1:
     Description: Please enter the IP range (CIDR notation) ex(10.0.10.0/24)
     Type: String
+    Default: 10.0.10.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
    
   PriCIDRWEB2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.20.0/24)
     Type: String
+    Default: 10.0.20.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
   PriCIDRWAS1:
     Description: Please enter the IP range (CIDR notation) ex(10.0.30.0/24)
     Type: String
+    Default: 10.0.30.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
   PriCIDRWAS2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.40.0/24)
     Type: String  
+    Default: 10.0.40.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
   PriCIDRDB1:
     Description: Please enter the IP range (CIDR notation) ex(10.0.50.0/24)
     Type: String
+    Default: 10.0.50.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
    
   PriCIDRDB2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.60.0/24)
     Type: String 
+    Default: 10.0.60.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
 
 
 

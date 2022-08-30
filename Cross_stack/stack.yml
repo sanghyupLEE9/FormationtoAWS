@@ -8,70 +8,27 @@ Metadata: #파라미터들의 그룹들을 Label 작업
         Label: 
           default: "Network Configuration"
         Parameters: 
-          - VpcCIDR
-          - PubCIDR1
-          - PubCIDR2
-          - PriCIDRWEB1
-          - PriCIDRWEB2
-          - PriCIDRWAS1
-          - PriCIDRWAS2
-          - PriCIDRDB1
-          - PriCIDRDB2
+          - KeyName
+          - AMI
 
-
+Mappings: # sample List ( 해당 리전에서 제공하는 AMI 및 리전의 각 AZ를 매핑)
+  Regionmap:  
+    ap-northeast-2:
+      Linux2: ami-0f2c95e9fe3f8f80e
+      window: ami-0685efd12a23690f5
           
-Parameters:   
-  VpcCIDR:
-    Description: Please enter the IP range (CIDR notation) for this VPC ex(10.0.0.0/16)
+Parameters: 
+  AMI:
+    Description: AMI of EC2
     Type: String
-    Default: 10.0.0.0/16
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: Linux2
+    AllowedValues:
+      - Linux2
+      - window
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Select your Keypair
 
-  PubCIDR1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.1.0/24)
-    Type: String
-    Default: 10.0.1.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-  PubCIDR2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.2.0/24)
-    Type: String
-    Default: 10.0.2.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-
-  PriCIDRWEB1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.10.0/24)
-    Type: String
-    Default: 10.0.10.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-  PriCIDRWEB2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.20.0/24)
-    Type: String
-    Default: 10.0.20.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-
-  PriCIDRWAS1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.30.0/24)
-    Type: String
-    Default: 10.0.30.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-  PriCIDRWAS2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.40.0/24)
-    Type: String
-    Default: 10.0.40.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-
-  PriCIDRDB1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.50.0/24)
-    Type: String
-    Default: 10.0.50.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-  PriCIDRDB2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.60.0/24)
-    Type: String
-    Default: 10.0.60.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-    
-    
     
     
 Resources:
@@ -81,17 +38,7 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
       TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack(Network).yml'
-      Parameters:
-        VpcCIDR: !Ref VpcCIDR
-        PubCIDR1: !Ref PubCIDR1
-        PubCIDR2: !Ref PubCIDR2
-        PriCIDRWEB1: !Ref PriCIDRWEB1
-        PriCIDRWEB2: !Ref PriCIDRWEB2
-        PriCIDRWAS1: !Ref PriCIDRWAS1
-        PriCIDRWAS2: !Ref PriCIDRWAS2
-        PriCIDRDB1: !Ref PriCIDRDB1
-        PriCIDRDB2: !Ref PriCIDRDB2
-  SGstack:
+  SGStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
       TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack(sg).yml'
@@ -100,3 +47,43 @@ Resources:
           Fn::GetAtt:
           - VPCStack
           - Outputs.VPCID         
+  LBStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack(LB).yml'
+      Parameters:
+        VPCID:
+          Fn::GetAtt:
+          - VPCStack
+          - Outputs.VPCID         
+        LBSubnets:
+          Fn::GetAtt:              
+          - VPCStack
+          - Outputs.PublicSubnet1
+        LBSubnets:
+          Fn::GetAtt:
+          - VPCStack
+          - Outputs.PublicSubnet2          
+        LBSG: 
+          Fn::GetAtt:        
+          - SGStack
+          - Outputs.EXLBsecurity
+        ASGSubnets:
+          Fn::GetAtt:          
+          - VPCStack
+          - Outputs.PrivateSubnetWEB1
+        ASGSubnets:
+          Fn::GetAtt:
+          - VPCStack
+          - Outputs.PrivateSubnetWEB2
+        ASGsg:
+          Fn::GetAtt:
+          - SGStack
+          - Outputs.websecurity
+        Key: !Ref KeyName
+
+
+
+          
+        
+

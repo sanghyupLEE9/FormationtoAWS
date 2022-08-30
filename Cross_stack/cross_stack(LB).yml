@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description:  Cross_Stack Loadbalancer + ASG 
+
+
+
+
+
+Mappings: # sample List ( 해당 리전에서 제공하는 AMI 및 리전의 각 AZ를 매핑)
+  Regionmap:  
+    ap-northeast-2:
+      Linux2: ami-0f2c95e9fe3f8f80e
+      window: ami-0685efd12a23690f5
+      
+
+Parameters:
+  AMI:
+    Description: AMI of EC2
+    Type: String
+    Default: Linux2
+    AllowedValues:
+      - Linux2
+      - window
+  VPCID:
+    Type: AWS::EC2::VPC::Id 
+  LBSubnets: 
+    Type: List<AWS::EC2::Subnet::Id>
+  LBSG:
+    Type: AWS::EC2::SecurityGroup::Id
+  ASGSubnets: 
+    Type: List<AWS::EC2::Subnet::Id>
+  ASGsg:
+    Type: AWS::EC2::SecurityGroup::Id
+  Key:
+    Type: AWS::EC2::KeyPair::KeyName
+
+
+Resources:
+  #########################################################
+  #                                                       #
+  #                         ALB                           #
+  #                                                       #    
+  #########################################################
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: CFNLB
+      Subnets: !Ref LBSubnets
+      SecurityGroups:
+        - !Ref LBSG
+      Tags:
+        - Key: Name
+          Value: CFNLB
+        - Key: Stack
+          Value: !Ref AWS::StackName
+
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+
+  
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: CFNTG
+      Vpc: !Ref VPCID
+      Port: 80
+      Protocol: HTTP
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+  #########################################################
+  #                                                       #
+  #                         ASG                           #
+  #                                                       #    
+  #########################################################
+  LaunchConf:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Description: Ec2 launch configuration
+    Properties:
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
+      InstanceType: t2.micro
+      LaunchConfigurationName: CFNConfig
+      KeyName: !Ref Key 
+      InstanceMonitoring: true
+      SecurityGroups: 
+        - !Ref ASGsg
+      UserData:
+        !Base64 |
+        #!/bin/bash -ex
+        amazon-linux-extras install -y epel
+        yum install -y mariadb* php httpd php-mysql git stress
+        git clone https://github.com/sanghyupLEE9/FormationtoAWS.git
+        cp /FormationtoAWS/index.php /var/www/html/index.php
+        systemctl enable httpd mariadb
+        systemctl start httpd mariadb
+
+
+  ASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Description: Logical Ec2 group
+    Properties:
+      MaxSize: 4
+      MinSize: 2
+      AutoScalingGroupName: CFNASG
+      Cooldown: 30 
+      DesiredCapacity: 2
+      LaunchConfigurationName: !Ref LaunchConf
+      VPCZoneIdentifier: !Ref ASGSubnets
+      TargetGroupARNs: 
+        - !Ref ALBTargetGroup
+      HealthCheckGracePeriod: 300
+      HealthCheckType: ELB
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: true
+          Value: web-asg
+          key : Stack
+          Value : !Ref AWS::StackName
+        
+
+  Ec2policy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref ASG
+      PolicyType: TargetTrackingScaling   #대상 추적 조정 정책 생성
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+
+
+        
+
+Outputs:
+  LoadBalancer:
+    Description: A reference to the Application Load Balancer
+    Value: !Ref ALB
+
+  LoadBalancerUrl:
+    Description: The URL of the ALB
+    Value: !GetAtt ALB.DNSName
+
+
+
+        
+
+
+
+ 
