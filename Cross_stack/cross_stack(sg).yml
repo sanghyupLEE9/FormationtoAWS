@@ -4,8 +4,7 @@ Description: Security group stack
 
 Parameters:
   VPCID:
-    Type: AWS::EC2::VPC::Id
-    Description: sg attach vpc
+    Type: String
   
 
 Resources:
@@ -138,7 +137,7 @@ Resources:
 Outputs:
   websecurity:
     Value: !Ref websecurity 
-  websecurity:
+  wassecurity:
     Value: !Ref WASsecurity 
   DBsecurity:
     Value: !Ref DBaccess

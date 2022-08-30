@@ -9,22 +9,14 @@ Metadata: #파라미터들의 그룹들을 Label 작업
           default: "Network Configuration"
         Parameters: 
           - KeyName
-          - AMI
+          - InstanceType
 
-Mappings: # sample List ( 해당 리전에서 제공하는 AMI 및 리전의 각 AZ를 매핑)
-  Regionmap:  
-    ap-northeast-2:
-      Linux2: ami-0f2c95e9fe3f8f80e
-      window: ami-0685efd12a23690f5
           
 Parameters: 
-  AMI:
-    Description: AMI of EC2
+  InstanceType:
     Type: String
-    Default: Linux2
-    AllowedValues:
-      - Linux2
-      - window
+    Default: t2.micro
+
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select your Keypair
@@ -52,35 +44,48 @@ Resources:
     Properties:
       TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack(LB).yml'
       Parameters:
-        VPCID:
+        VPCId:
           Fn::GetAtt:
           - VPCStack
           - Outputs.VPCID         
-        LBSubnets:
+        InstanceType: !Ref InstanceType
+        PublicSubnet1:
           Fn::GetAtt:              
           - VPCStack
           - Outputs.PublicSubnet1
-        LBSubnets:
+        PublicSubnet2:
           Fn::GetAtt:
           - VPCStack
           - Outputs.PublicSubnet2          
-        LBSG: 
+        EXLBsecurity: 
           Fn::GetAtt:        
           - SGStack
           - Outputs.EXLBsecurity
-        ASGSubnets:
+        PrivateSubnetWEB1:
           Fn::GetAtt:          
           - VPCStack
           - Outputs.PrivateSubnetWEB1
-        ASGSubnets:
+        PrivateSubnetWEB2:
           Fn::GetAtt:
           - VPCStack
           - Outputs.PrivateSubnetWEB2
-        ASGsg:
+        PrivateSubnetWAS1:
+          Fn::GetAtt:
+          - VPCStack
+          - Outputs.PrivateSubnetWAS1
+        PrivateSubnetWAS2:
+          Fn::GetAtt:
+          - VPCStack
+          - Outputs.PrivateSubnetWAS2
+        websecurity:
           Fn::GetAtt:
           - SGStack
           - Outputs.websecurity
         Key: !Ref KeyName
+        sshsecurity:
+          Fn::GetAtt:
+          - SGStack
+          - Outputs.sshsecurity
 
 
 

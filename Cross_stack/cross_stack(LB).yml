@@ -1,40 +1,64 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description:  Cross_Stack Loadbalancer + ASG 
 
-
-
-
-
-Mappings: # sample List ( 해당 리전에서 제공하는 AMI 및 리전의 각 AZ를 매핑)
+Mappings:
   Regionmap:  
     ap-northeast-2:
-      Linux2: ami-0f2c95e9fe3f8f80e
-      window: ami-0685efd12a23690f5
-      
+      Linux2: ami-01d87646ef267ccd7 
+
 
 Parameters:
   AMI:
-    Description: AMI of EC2
     Type: String
     Default: Linux2
-    AllowedValues:
-      - Linux2
-      - window
-  VPCID:
-    Type: AWS::EC2::VPC::Id 
-  LBSubnets: 
-    Type: List<AWS::EC2::Subnet::Id>
-  LBSG:
-    Type: AWS::EC2::SecurityGroup::Id
-  ASGSubnets: 
-    Type: List<AWS::EC2::Subnet::Id>
-  ASGsg:
-    Type: AWS::EC2::SecurityGroup::Id
+
+  VPCId:
+    Type: String
+  EXLBsecurity:
+    Type: String
+  websecurity:
+    Type: String
   Key:
-    Type: AWS::EC2::KeyPair::KeyName
+    Type: String
+  InstanceType:
+    Type: String
+  sshsecurity:
+    Type: String
+  PublicSubnet1:
+    Type: String
+  PublicSubnet2:
+    Type: String
+  PrivateSubnetWEB1:
+    Type: String
+  PrivateSubnetWEB2:
+    Type: String
+  PrivateSubnetWAS1:
+    Type: String
+  PrivateSubnetWAS2:
+    Type: String
+ 
+
 
 
 Resources:
+  bastion:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
+      KeyName: !Ref Key
+      SecurityGroupIds: 
+      - !Ref sshsecurity
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: BastionHost
+          Key: Stack
+          Value: !Ref AWS::StackName
+
+
+
+
   #########################################################
   #                                                       #
   #                         ALB                           #
@@ -44,9 +68,11 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: CFNLB
-      Subnets: !Ref LBSubnets
+      Subnets: 
+      - !Ref PublicSubnet1
+      - !Ref PublicSubnet2
       SecurityGroups:
-        - !Ref LBSG
+        - !Ref EXLBsecurity
       Tags:
         - Key: Name
           Value: CFNLB
@@ -68,7 +94,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: CFNTG
-      Vpc: !Ref VPCID
+      VpcId: !Ref VPCId
       Port: 80
       Protocol: HTTP
       HealthCheckEnabled: true
@@ -88,12 +114,12 @@ Resources:
     Description: Ec2 launch configuration
     Properties:
       ImageId: !FindInMap [Regionmap, !Ref 'AWS::Region', Linux2]
-      InstanceType: t2.micro
+      InstanceType: !Ref InstanceType
       LaunchConfigurationName: CFNConfig
       KeyName: !Ref Key 
       InstanceMonitoring: true
       SecurityGroups: 
-        - !Ref ASGsg
+        - !Ref websecurity
       UserData:
         !Base64 |
         #!/bin/bash -ex
@@ -115,7 +141,9 @@ Resources:
       Cooldown: 30 
       DesiredCapacity: 2
       LaunchConfigurationName: !Ref LaunchConf
-      VPCZoneIdentifier: !Ref ASGSubnets
+      VPCZoneIdentifier: 
+        - !Ref PrivateSubnetWEB1
+        - !Ref PrivateSubnetWEB2
       TargetGroupARNs: 
         - !Ref ALBTargetGroup
       HealthCheckGracePeriod: 300
