@@ -9,8 +9,9 @@ Metadata: #파라미터들의 그룹들을 Label 작업
         Label: 
           default: "Loadbalancer Configuration"
         Parameters: 
-          - ELBSubnets
+          - LBSubnets
           - VPC
+          - LBSG
 
       - 
         Label: 
@@ -46,10 +47,12 @@ Parameters:
   VPC:
     Description: Select your VPC 
     Type: AWS::EC2::VPC::Id 
-  ELBSubnets: #List를 이용한 다중 Subnet 선택
+  LBSubnets: #List를 이용한 다중 Subnet 선택
     Type: List<AWS::EC2::Subnet::Id>
     Description: select your subnets 
-    
+  LBSG:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Select your SG Group  
   ASGSubnets: #ASG을 구성할 private subnet의 다중 선택
     Description: select your subnets 
     Type: List<AWS::EC2::Subnet::Id>
@@ -64,29 +67,13 @@ Resources:
   #                         ALB                           #
   #                                                       #    
   #########################################################
-  Loadbalancersg:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: ALB Security Group
-      GroupName: !Sub ${EnvironmentName}-LBsg
-      VpcId:
-        !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIp: 0.0.0.0/0
   ALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: !Sub ${EnvironmentName}-LB
-      Subnets: !Ref ELBSubnets
+      Subnets: !Ref LBSubnets
       SecurityGroups:
-        - !Ref Loadbalancersg
+        - !Ref LBSG
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-LB
