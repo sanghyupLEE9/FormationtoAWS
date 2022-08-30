@@ -30,11 +30,11 @@ Resources:
           Value: SSHSG
         - Key: stack
           Value: !Ref AWS::StackName  
-  ELBsecurity:
+  EXLBsecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: allow http and https
-      GroupName: ELB-security
+      GroupName: EXLB-security
       VpcId:
         !Ref VPCID
       SecurityGroupIngress:
@@ -53,6 +53,26 @@ Resources:
           Value: exLBSG
         - Key: stack
           Value: !Ref AWS::StackName 
+
+  InLBsecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow http port 8080
+      GroupName: InLB-security
+      VpcId:
+        !Ref VPCID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        SourceSecurityGroupId: !Ref websecurity
+
+      Tags:
+        - Key: Name
+          Value: inLBSG
+        - Key: stack
+          Value: !Ref AWS::StackName
+
   websecurity:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -64,7 +84,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-        SourceSecurityGroupId: !Ref ELBsecurity
+        SourceSecurityGroupId: !Ref EXLBsecurity
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
@@ -74,6 +94,29 @@ Resources:
           Value: WEBSG
         - Key: stack
           Value: !Ref AWS::StackName
+  
+  WASsecurity:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow 8080
+      GroupName:  was-security
+      VpcId:
+        !Ref VPCID
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        SourceSecurityGroupId: !Ref InLBsecurity
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        SourceSecurityGroupId: !Ref sshsecurity
+      Tags:
+        - Key: Name
+          Value: WASSG
+        - Key: stack
+          Value: !Ref AWS::StackName
+
   DBaccess:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -84,7 +127,7 @@ Resources:
       - IpProtocol: TCP
         FromPort: 3306
         ToPort: 3306
-        SourceSecurityGroupId: !Ref websecurity
+        SourceSecurityGroupId: !Ref WASsecurity
       Tags:
         - Key: Name
           Value: DBSG
@@ -94,16 +137,16 @@ Resources:
 
 Outputs:
   websecurity:
-    Description: web sercurity group
     Value: !Ref websecurity 
+  websecurity:
+    Value: !Ref WASsecurity 
   DBsecurity:
-    Description: web sercurity group
     Value: !Ref DBaccess
   sshsecurity:
-    Description: web sercurity group
     Value: !Ref sshsecurity              
-  ELBsecurity:
-    Description: ELB security group
-    Value: !Ref ELBsecurity
+  EXLBsecurity:
+    Value: !Ref EXLBsecurity
+  InLBsecurity:
+    Value: !Ref InLBsecurity
 
         

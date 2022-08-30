@@ -13,6 +13,8 @@ Metadata: #파라미터들의 그룹들을 Label 작업
           - PubCIDR2
           - PriCIDRWEB1
           - PriCIDRWEB2
+          - PriCIDRWAS1
+          - PriCIDRWAS2
           - PriCIDRDB1
           - PriCIDRDB2
 
@@ -26,35 +28,47 @@ Parameters:
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
   PubCIDR1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.1.0/24)
+    Type: String
+    Default: 10.0.1.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PubCIDR2:
     Description: Please enter the IP range (CIDR notation) ex(10.0.2.0/24)
     Type: String
     Default: 10.0.2.0/24
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-  PubCIDR2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.4.0/24)
-    Type: String
-    Default: 10.0.4.0/24
-    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
 
   PriCIDRWEB1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.10.0/24)
     Type: String
-    Default: 10.0.8.0/24
+    Default: 10.0.10.0/24
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
   PriCIDRWEB2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.20.0/24)
     Type: String
-    Default: 10.0.16.0/24
+    Default: 10.0.20.0/24
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
-  PriCIDRDB1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
+
+  PriCIDRWAS1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.30.0/24)
     Type: String
-    Default: 10.0.32.0/24
+    Default: 10.0.30.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PriCIDRWAS2:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.40.0/24)
+    Type: String
+    Default: 10.0.40.0/24
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+
+  PriCIDRDB1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.50.0/24)
+    Type: String
+    Default: 10.0.50.0/24
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
   PriCIDRDB2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.60.0/24)
     Type: String
-    Default: 10.0.64.0/24
+    Default: 10.0.60.0/24
     AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
     
     
@@ -66,19 +80,21 @@ Resources:
   VPCStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
-      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack/stack_vpc(cross_stack).yml' 
+      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack(Network).yml'
       Parameters:
         VpcCIDR: !Ref VpcCIDR
         PubCIDR1: !Ref PubCIDR1
         PubCIDR2: !Ref PubCIDR2
         PriCIDRWEB1: !Ref PriCIDRWEB1
         PriCIDRWEB2: !Ref PriCIDRWEB2
+        PriCIDRWAS1: !Ref PriCIDRWAS1
+        PriCIDRWAS2: !Ref PriCIDRWAS2
         PriCIDRDB1: !Ref PriCIDRDB1
         PriCIDRDB2: !Ref PriCIDRDB2
   SGstack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
-      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack/cross_stack(sg).yml'
+      TemplateURL: 'https://formation-lsh.s3.ap-northeast-2.amazonaws.com/cross_stack(sg).yml'
       Parameters:
         VPCID:
           Fn::GetAtt:

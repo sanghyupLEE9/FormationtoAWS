@@ -9,30 +9,37 @@ Parameters:
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC ex(10.0.0.0/16)
     Type: String
-    
 
   PubCIDR1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.2.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.1.0/24)
     Type: String
     
   PubCIDR2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.4.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.2.0/24)
     Type: String
 
   PriCIDRWEB1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.8.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.10.0/24)
     Type: String
    
   PriCIDRWEB2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.16.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.20.0/24)
     Type: String
-    
+
+  PriCIDRWAS1:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.30.0/24)
+    Type: String
+
+  PriCIDRWAS2:
+    Description: Please enter the IP range (CIDR notation) ex(10.0.40.0/24)
+    Type: String  
+
   PriCIDRDB1:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.32.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.50.0/24)
     Type: String
    
   PriCIDRDB2:
-    Description: Please enter the IP range (CIDR notation) ex(10.0.64.0/24)
+    Description: Please enter the IP range (CIDR notation) ex(10.0.60.0/24)
     Type: String 
 
 
@@ -117,6 +124,32 @@ Resources:
       Tags:
         - Key: Name
           Value: Private SubnetWEB2
+        - Key: stackName
+          Value: !Ref 'AWS::StackName'
+  PrivateSubnetWAS1:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      CidrBlock: !Ref PriCIDRWAS1
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: Private SubnetWAS1
+        - Key: stackName
+          Value: !Ref 'AWS::StackName'
+  PrivateSubnetWAS2:
+    Type: AWS::EC2::Subnet
+    DependsOn: VPC
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 2, !GetAZs ]
+      CidrBlock: !Ref PriCIDRWAS2
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: Private SubnetWAS2
         - Key: stackName
           Value: !Ref 'AWS::StackName'
   PrivateSubnetDB1:
@@ -240,9 +273,23 @@ Resources:
     DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
     Properties:
       RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnetDB1
+      SubnetId: !Ref PrivateSubnetWAS1
 
   PrivateSubnet4RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetWAS2    
+
+  PrivateSubnet5RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetDB1
+
+  PrivateSubnet6RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     DependsOn: [PrivateRouteTable, NatGateway,PrivateRoute]
     Properties:
@@ -256,21 +303,21 @@ Outputs:
     Value: !Ref VPC
 
   PublicSubnet1:
-    Description: A reference to the public subnet in the 1st Availability Zone
     Value: !Ref PublicSubnet1
   PublicSubnet2:
-    Description: A reference to the public subnet in the 2nd Availability Zone
     Value: !Ref PublicSubnet2
 
-  PrivateSubnet1:
-    Description: A reference to the private subnet in the 1st Availability Zone
+  PrivateSubnetWEB1:
     Value: !Ref PrivateSubnetWEB1
-  PrivateSubnet2:
-    Description: A reference to the private subnet in the 2nd Availability Zone
+  PrivateSubnetWEB2:
     Value: !Ref PrivateSubnetWEB2
-  PrivateSubnet3:
-    Description: A reference to the private subnet in the 1st Availability Zone
+  
+  PrivateSubnetWAS1:
+    Value: !Ref PrivateSubnetWAS1
+  PrivateSubnetWAS2:
+    Value: !Ref PrivateSubnetWAS2
+
+  PrivateSubnetDB1:
     Value: !Ref PrivateSubnetDB1
-  PrivateSubnet4:
-    Description: A reference to the private subnet in the 2nd Availability Zone
+  PrivateSubnetDB2:
     Value: !Ref PrivateSubnetDB2
